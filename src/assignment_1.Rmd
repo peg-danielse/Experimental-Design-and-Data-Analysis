@@ -1,0 +1,49 @@
+---
+title: "Assignment 1"
+author: "PD, JO, and MvD, group 06"
+date: "17 febuary 2023"
+output: pdf_document
+highlight: tango
+---
+
+## Exercise 1
+Here is the part for exercise 1
+**a)**
+```{r}
+# what is code without comments
+print("exercise 1.a code here!")
+
+```
+
+## Exercise 2
+Here is the part for exercise 2
+**a)**
+```{r}
+# what is code without comments
+print("exercise 2.a code here!")
+
+```
+
+
+
+
+## Exercise 3
+Here is the part for exercise 3
+**a)**
+
+```{r}
+# what is code without comments
+print("exercise 3.a code here!")
+
+```
+
+
+## Exercise 4
+Here is the part for exercise 4
+**a)**
+
+```{r}
+# what is code without comments
+print("exercise 4.a code here!")
+
+```
