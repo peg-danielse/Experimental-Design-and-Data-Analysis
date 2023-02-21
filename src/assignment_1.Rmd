@@ -22,6 +22,32 @@ Here is the part for exercise 2
 # what is code without comments
 print("exercise 2.a code here!")
 
+fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0))
+
+
+boxplot(fat)
+attach(fat)
+
+par(mfrow = c(1,2))
+hist(before)
+hist(after)
+
+par(mfrow = c(1,2))
+qqnorm(before)
+qqnorm(after)
+
+plot(before~after)
+cor.test(before, after)
+cor.test(before, after, method="spearman")
+
+t.test(before, after, paired = TRUE) # are the samples paired? yes
+
+#Do permutation test
+
+#write text.
+
+
+
 ```
 
 
