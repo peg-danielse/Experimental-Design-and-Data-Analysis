@@ -7,8 +7,11 @@ highlight: tango
 ---
 
 ## Exercise 1
+
 Here is the part for exercise 1
+
 **a)**
+
 ```{r}
 # what is code without comments
 print("exercise 1.a code here!")
@@ -16,71 +19,92 @@ print("exercise 1.a code here!")
 ```
 
 ## Exercise 2
-Here is the part for exercise 2
-**a)**
+
 ```{r}
-# what is code without comments
-print("exercise 2.a code here!")
-
-fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0))
-
-#a
-boxplot(fat)
+fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0)) 
 attach(fat)
+```
 
-par(mfrow = c(1,2))
-hist(before)
-hist(after)
+**a)**
 
-par(mfrow = c(1,2))
-qqnorm(before)
-qqnorm(after)
+To investigate the data set we create a box plot of both columns. Judging from this we can observe a possible difference. the mean of the data from after 8 weeks appears to be lower.
 
+```{r}
+boxplot(fat)
+```
+
+Next we plot a normal Q-Q plot to check if the data is normally distributed. this appears to be the case.
+
+```{r}
+par(mfrow = c(1,2)); qqnorm(before); qqnorm(after)
+```
+
+To check if the before and after 8 weeks data is correlated we can plot the two data sets against each other. The plot shows a clear linear correlation between before and after. Then we can confirm this with both the Pearson's and Spearman's correlation test. Both of these give the conclusion that there indeed is a correlation and it is a strong correlation with **an r value of 0.99.**
+
+```{r}
 plot(before~after)
 
 cor.test(before, after)
 cor.test(before, after, method="spearman")
+```
 
-``` 
-**b)**
+**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether
+the diet with low fat margarine has an effect (argue whether the data
+are paired or not). Is a permutation test applicable?
+
+Since the data is collected from the same patient before and after 8 weeks it is clear the data is paired. We can therefore perform a t-test to investigate whether there is a difference in the mean of the before and after data.
+
 ```{r}
+t.test(before, after, alternative="greater", paired = TRUE)
+```
 
-t.test(before, after, paired = TRUE) # are the samples paired? yes
+This shows that there is an actual difference in mean between the before and after data.
 
+We also perform a Wilcoxon signed rank test to check if the same conclusion will be drawn. This test concludes the same. There is a significant difference in mean between the before and after data.
+
+```{r}
+wilcox.test(before, after, alternative = "greater")
+```
+
+```{r}
 permStat = function(x, y) { mean(x-y) }
 
 B = 1000; tstar=numeric(B);
 i =0
-for(i in i:B) { 
+for(i in i:B) {
   cbind = cbind(before, after)
   fatStar = t(apply(cbind,1,sample))
   tstar[i] = permStat(fatStar[,1], fatStar[,2]) 
-  }
+}
 
 t = permStat(before, after)
 print(t)
 
 hist(tstar, xlim = c(-0.6,0.6))
-lines(rep(t,2), c(0,20), col = "lightblue", lwd=2)
+lines(rep(t,2), c(0,20), col = "red", lwd=2)
 p1=sum(tstar<t)/B
 pr=sum(tstar>t)/B
 p=2*min(p1,pr); p
 #conclusion indeed significant difference
 
-``` 
+```
+
 **c)**
+
 ```{r}
 # bootstrap test to find out if fat$after is uniformly distributed. and construct a 95% confidence interval. (Kolmogorov-Smirnov?)
 
+```
+
+**d)**
+
+```{r}
 
 ```
 
-
-
-
 ## Exercise 3
-Here is the part for exercise 3
-**a)**
+
+Here is the part for exercise 3 **a)**
 
 ```{r}
 # what is code without comments
@@ -88,10 +112,9 @@ print("exercise 3.a code here!")
 
 ```
 
-
 ## Exercise 4
-Here is the part for exercise 4
-**a)**
+
+Here is the part for exercise 4 **a)**
 
 ```{r}
 # what is code without comments
