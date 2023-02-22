@@ -24,7 +24,7 @@ print("exercise 2.a code here!")
 
 fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0))
 
-
+#a
 boxplot(fat)
 attach(fat)
 
@@ -37,15 +37,40 @@ qqnorm(before)
 qqnorm(after)
 
 plot(before~after)
+
 cor.test(before, after)
 cor.test(before, after, method="spearman")
 
+``` 
+**b)**
+```{r}
+
 t.test(before, after, paired = TRUE) # are the samples paired? yes
 
-#Do permutation test
+permStat = function(x, y) { mean(x-y) }
 
-#write text.
+B = 1000; tstar=numeric(B);
+i =0
+for(i in i:B) { 
+  cbind = cbind(before, after)
+  fatStar = t(apply(cbind,1,sample))
+  tstar[i] = permStat(fatStar[,1], fatStar[,2]) 
+  }
 
+t = permStat(before, after)
+print(t)
+
+hist(tstar, xlim = c(-0.6,0.6))
+lines(rep(t,2), c(0,20), col = "lightblue", lwd=2)
+p1=sum(tstar<t)/B
+pr=sum(tstar>t)/B
+p=2*min(p1,pr); p
+#conclusion indeed significant difference
+
+``` 
+**c)**
+```{r}
+# bootstrap test to find out if fat$after is uniformly distributed. and construct a 95% confidence interval. (Kolmogorov-Smirnov?)
 
 
 ```
