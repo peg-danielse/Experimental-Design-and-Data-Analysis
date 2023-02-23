@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1"
-author: "PD, JO, and MvD, group 06"
+author: "PD, JO, and MD, group 70"
 date: "17 febuary 2023"
 output: pdf_document
 highlight: tango
@@ -10,11 +10,67 @@ highlight: tango
 
 Here is the part for exercise 1
 
+```{r}
+birthweight = read.table(file="../datasets/birthweight.txt", header=FALSE)
+birthweight <- birthweight[2:189,]
+birthweight <- as.numeric(unlist(birthweight))
+```
+
 **a)**
 
 ```{r}
-# what is code without comments
-print("exercise 1.a code here!")
+# check normality
+shapiro.test(birthweight)
+qqnorm(birthweight)
+ 
+# 96%-CI
+t.test(birthweight, mu=0, conf.level = 0.96)
+
+#sample size needed for CI length of 100
+e = 100/mean(birthweight)
+qnorm(0.98)^2*0.96*0.04/(e/2)^2
+
+#paul had de bootstrap
+```
+
+**b)**
+
+```{r}
+#t-test to verify mean weight is bigger than 2800
+t.test(birthweight, mu=2800, alternative = "g")
+
+#sign test
+binom.test(sum(birthweight>2800), length(birthweight), alternative = "g")
+```
+
+**c)**
+
+```{r}
+#geen idee of dit goed is
+#power of t-test and sign test
+B=10000; n=188
+psign = numeric(B)
+pttest = numeric(B)
+
+for(i in 1:B){
+  x = rnorm(n, mean=2800, sd=700)
+  pttest[i] = t.test(x, mu=2800, alternative = "g")[[3]]
+  psign[i] = binom.test(sum(x>2800),n , alternative ="g")[[3]]
+}
+
+sum(psign<0.05)/B
+sum(pttest<0.05)/B
+```
+
+**d)**
+
+```{r}
+
+```
+
+**e)**
+
+```{r}
 
 ```
 
@@ -48,9 +104,7 @@ cor.test(before, after)
 cor.test(before, after, method="spearman")
 ```
 
-**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether
-the diet with low fat margarine has an effect (argue whether the data
-are paired or not). Is a permutation test applicable?
+**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether the diet with low fat margarine has an effect (argue whether the data are paired or not). Is a permutation test applicable?
 
 Since the data is collected from the same patient before and after 8 weeks it is clear the data is paired. We can therefore perform a t-test to investigate whether there is a difference in the mean of the before and after data.
 
