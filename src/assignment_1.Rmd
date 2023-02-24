@@ -280,7 +280,7 @@ binom.test(x, n, x/n, "l")
 Next to the wilcox.
 
 ```{r}
-?wilcox.test(after,mu=6
+?wilcox.test(after,mu=6)
 ```
 
 ## Exercise 3
@@ -318,7 +318,7 @@ case so go over to our hypothesis.
     among the three types of diets.
 
     Our p-value of 0.832 is greater than our significance level of 0.05
-    this means we can not reject our null hypothesis \
+    this means we can not reject our null hypothesis\
     The Kruskal-Wallis is also valid because it has the same
     pre-conditions as the anova test the difference is that
     Kruskal-Wallis test can also be used when normality fails
