@@ -4,6 +4,9 @@ author: "PD, JO, and MD, group 70"
 date: "17 febuary 2023"
 output: pdf_document
 highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Exercise 1
@@ -15,8 +18,6 @@ birthweight = read.table(file="../datasets/birthweight.txt", header=FALSE)
 birthweight <- birthweight[2:189,]
 birthweight <- as.numeric(unlist(birthweight))
 ```
-
-**a)**
 
 ```{r}
 # check normality
@@ -77,7 +78,30 @@ confidence_level = 1 - alpha
 
 **e)**
 
+-   Null hypothesis (H0): The mean weight is the same for male and
+    female babies.
+
+-   Alternative hypothesis (Ha): The mean weight is different for male
+    and female babies.
+
+Our p-value of 0.568 is higher then alpha of 0.05 this means we cant
+reject our null hypothesis
+
 ```{r}
+female_below_2600 = 28
+male_below_2600 =34
+male_total = 95
+female_total = 93
+
+# Create vectors of the data
+prop.test(c(male_below_2600,female_below_2600), c(male_total,female_total))
+```
+
+```{r}
+male_weights <- c(rep(NA,34),rep(NA,61))
+female_weights <- c(rep(NA,28),rep(NA,65))
+
+t.test(male_weights, female_weights, var.equal = TRUE)
 
 ```
 
@@ -90,19 +114,27 @@ attach(fat)
 
 **a)**
 
-To investigate the data set we create a box plot of both columns. Judging from this we can observe a possible difference. the mean of the data from after 8 weeks appears to be lower.
+To investigate the data set we create a box plot of both columns.
+Judging from this we can observe a possible difference. the mean of the
+data from after 8 weeks appears to be lower.
 
 ```{r}
 boxplot(fat)
 ```
 
-Next we plot a normal Q-Q plot to check if the data is normally distributed. this appears to be the case.
+Next we plot a normal Q-Q plot to check if the data is normally
+distributed. this appears to be the case.
 
 ```{r}
 par(mfrow = c(1,2)); qqnorm(before); qqnorm(after)
 ```
 
-To check if the before and after 8 weeks data is correlated we can plot the two data sets against each other. The plot shows a clear linear correlation between before and after. Then we can confirm this with both the Pearson's and Spearman's correlation test. Both of these give the conclusion that there indeed is a correlation and it is a strong correlation with **an r value of 0.99.**
+To check if the before and after 8 weeks data is correlated we can plot
+the two data sets against each other. The plot shows a clear linear
+correlation between before and after. Then we can confirm this with both
+the Pearson's and Spearman's correlation test. Both of these give the
+conclusion that there indeed is a correlation and it is a strong
+correlation with **an r value of 0.99.**
 
 ```{r}
 plot(before~after)
@@ -111,17 +143,25 @@ cor.test(before, after)
 cor.test(before, after, method="spearman")
 ```
 
-**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether the diet with low fat margarine has an effect (argue whether the data are paired or not). Is a permutation test applicable?
+**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether
+the diet with low fat margarine has an effect (argue whether the data
+are paired or not). Is a permutation test applicable?
 
-Since the data is collected from the same patient before and after 8 weeks it is clear the data is paired. We can therefore perform a t-test to investigate whether there is a difference in the mean of the before and after data.
+Since the data is collected from the same patient before and after 8
+weeks it is clear the data is paired. We can therefore perform a t-test
+to investigate whether there is a difference in the mean of the before
+and after data.
 
 ```{r}
 t.test(before, after, alternative="greater", paired = TRUE)
 ```
 
-This shows that there is an actual difference in mean between the before and after data.
+This shows that there is an actual difference in mean between the before
+and after data.
 
-We also perform a Wilcoxon signed rank test to check if the same conclusion will be drawn. This test concludes the same. There is a significant difference in mean between the before and after data.
+We also perform a Wilcoxon signed rank test to check if the same
+conclusion will be drawn. This test concludes the same. There is a
+significant difference in mean between the before and after data.
 
 ```{r}
 wilcox.test(before, after, alternative = "greater")
@@ -172,15 +212,82 @@ diet = read.table("../datasets/diet.txt", header = TRUE)
 Here is the part for exercise 3 **a)**
 
 ```{r}
-# what is code without comments
+par(mfrow=c(1,2))
+boxplot(x = diet$weight6weeks,xlab= "Weight 6 weeks" )
+boxplot(x = diet$preweight,  xlab= "Pre-weight")
 
+#Check for if data is normaly distributed
+hist(diet$weight6weeks - diet$preweight, main = "Difference in weight after 6 weeks", xlab = "Difference")
+qqnorm(diet$weight6weeks - diet$preweight)
+qqline(diet$weight6weeks - diet$preweight)
+
+
+t.test(diet$preweight, diet$weight6weeks, paired = TRUE)
 ```
 
 **b)**
 
-```{r}
+Our goal is to use one-way ANOVA test to compare the diets. We first
+draw QQ-plot to check if we can assume normality this seems to be the
+case so go over to our hypothesis.
 
+-   Null hypothesis: The means of the lost weight are equal among the
+    three types of diets.
+
+-   Alternative hypothesis: The means of the lost weight are not equal
+    among the three types of diets.
+
+    Our p-value of 0.832 is greater than our significance level of 0.05
+    this means we can not reject our null hypothesis \
+    The Kruskal-Wallis is also valid because it has the same
+    pre-conditions as the anova test the difference is that
+    Kruskal-Wallis test can also be used when normality fails
+
+```{r}
+dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet))
+dietanov=lm(weight~diet ,data = dietframe)
+anova(dietanov)
+par(mfrow=c(1,2)); qqnorm(residuals(dietanov))
+qqline(residuals(dietanov))
+plot(fitted(dietanov),residuals(dietanov))
 ```
+
+**c )**
+
+Our goal is to use two-way ANOVA test to compare the diets. We first
+draw QQ-plot to check if we can assume normality this seems to be the
+case so we can go over to our hypothesis.
+
+-   Null hypothesis: The means of the lost weight are equal among the
+    three types of diets.
+
+-   Alternative hypothesis: The means of the lost weight are not equal
+    among the three types of diets.
+
+Our p-value based on interaction between the parameters is 0.758 is
+greater than our significance level of 0.05 this means we can not reject
+our null hypothesis. There seems to be no interaction between the
+interaction those variables have on response variable. Although gender
+seems to have an effect on weight loss.
+
+```{r}
+dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet), gender=factor(diet$gender))
+dietanov=lm(weight~diet*gender ,data = dietframe)
+anova(dietanov)
+par(mfrow=c(1,2))
+qqnorm(residuals(dietanov))
+plot(fitted(dietanov), residuals(dietanov))
+```
+
+**d ) Dropped**
+
+**e )**
+
+⚠️**Ome Paul kijk hier nog even na ⚠️**
+
+We prefer the use of the one-way anova-test, because it focusses on
+relation between one two variables which makes more clear to spot a
+relation.
 
 ## Exercise 4
 
@@ -189,5 +296,5 @@ Here is the part for exercise 4 **a)**
 ```{r}
 # what is code without comments
 print("exercise 4.a code here!")
-
+# 
 ```
