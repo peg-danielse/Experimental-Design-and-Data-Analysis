@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1"
-author: "PD, JO, and MvD, group 06"
+author: "PD, JO, and MD, group 70"
 date: "17 febuary 2023"
 output: pdf_document
 highlight: tango
@@ -10,12 +10,13 @@ editor_options:
 ---
 
 ## Exercise 1
+Here is the part for exercise 1
 
-**a)**
-**b)** 
-**c)**
-**e)**
-
+```{r}
+birthweight = read.table(file="../datasets/birthweight.txt", header=FALSE)
+birthweight <- birthweight[2:189,]
+birthweight <- as.numeric(unlist(birthweight))
+```
 -   Null hypothesis (H0): The mean weight is the same for male and
     female babies.
 
@@ -26,9 +27,65 @@ Our p-value of 0.56 is higher then alpha of 0.05 this means we cant
 reject our null hypothesis
 
 ```{r}
-male_below_2600 = 34
-female_below_2600 = 28
+# check normality
+shapiro.test(birthweight)
+qqnorm(birthweight)
+ 
+# 96%-CI
+t.test(birthweight, mu=0, conf.level = 0.96)
 
+#sample size needed for CI length of 100
+e = 100/mean(birthweight)
+qnorm(0.98)^2*0.96*0.04/(e/2)^2
+
+#paul had de bootstrap
+```
+
+**b)**
+
+```{r}
+#t-test to verify mean weight is bigger than 2800
+t.test(birthweight, mu=2800, alternative = "g")
+
+#sign test
+binom.test(sum(birthweight>2800), length(birthweight), alternative = "g")
+```
+
+**c)**
+
+```{r}
+#geen idee of dit goed is
+#power of t-test and sign test
+B=10000; n=188
+psign = numeric(B)
+pttest = numeric(B)
+
+for(i in 1:B){
+  x = rnorm(n, mean=2800, sd=700)
+  pttest[i] = t.test(x, mu=2800, alternative = "g")[[3]]
+  psign[i] = binom.test(sum(x>2800), n, alternative ="g")[[3]]
+}
+
+sum(pttest<0.05)/B
+sum(psign<0.05)/B
+```
+
+**d)**
+
+```{r}
+n = length(birthweight)
+lower_bound = 0.25
+alpha = 0.05
+p_hat = sum(birthweight<2600)/n
+standard_error = sqrt((p_hat*(1-p_hat))/n)
+z = qnorm(1-alpha)
+error_margin = z * standard_error
+upper_bound = p_hat + error_margin
+```
+
+**e)**
+
+```{r}
 male_total = 95
 female_total = 91
 
@@ -117,11 +174,14 @@ p=2*min(p1,pr); p
 ```
 ## Exercise 3
 
+```{r}
+diet = read.table("../datasets/diet.txt", header = TRUE)
+```
+
 Here is the part for exercise 3 **a)**
 
 ```{r}
 # what is code without comments
-print("exercise 3.a code here!")
 
 ```
 
