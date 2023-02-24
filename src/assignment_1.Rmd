@@ -55,17 +55,24 @@ pttest = numeric(B)
 for(i in 1:B){
   x = rnorm(n, mean=2800, sd=700)
   pttest[i] = t.test(x, mu=2800, alternative = "g")[[3]]
-  psign[i] = binom.test(sum(x>2800),n , alternative ="g")[[3]]
+  psign[i] = binom.test(sum(x>2800), n, alternative ="g")[[3]]
 }
 
-sum(psign<0.05)/B
 sum(pttest<0.05)/B
+sum(psign<0.05)/B
 ```
 
 **d)**
 
 ```{r}
-
+n = length(birthweight)
+lower_bound = 0.25
+alpha = 0.05
+p_hat = sum(birthweight<2600)/n
+standard_error = sqrt((p_hat*(1-p_hat))/n)
+z = qnorm(1-alpha)
+error_margin = z * standard_error
+upper_bound = p_hat + error_margin
 ```
 
 **e)**
@@ -158,11 +165,14 @@ p=2*min(p1,pr); p
 
 ## Exercise 3
 
+```{r}
+diet = read.table("../datasets/diet.txt", header = TRUE)
+```
+
 Here is the part for exercise 3 **a)**
 
 ```{r}
 # what is code without comments
-print("exercise 3.a code here!")
 
 ```
 
