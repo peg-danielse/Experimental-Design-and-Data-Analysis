@@ -48,9 +48,7 @@ cor.test(before, after)
 cor.test(before, after, method="spearman")
 ```
 
-**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether
-the diet with low fat margarine has an effect (argue whether the data
-are paired or not). Is a permutation test applicable?
+**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether the diet with low fat margarine has an effect (argue whether the data are paired or not). Is a permutation test applicable?
 
 Since the data is collected from the same patient before and after 8 weeks it is clear the data is paired. We can therefore perform a t-test to investigate whether there is a difference in the mean of the before and after data.
 
