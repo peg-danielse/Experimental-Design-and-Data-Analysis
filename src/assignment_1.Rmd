@@ -4,22 +4,39 @@ author: "PD, JO, and MvD, group 06"
 date: "17 febuary 2023"
 output: pdf_document
 highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Exercise 1
 
-Here is the part for exercise 1
-
 **a)**
+**b)** 
+**c)**
+**e)**
+
+-   Null hypothesis (H0): The mean weight is the same for male and
+    female babies.
+
+-   Alternative hypothesis (Ha): The mean weight is different for male
+    and female babies.
+
+Our p-value of 0.56 is higher then alpha of 0.05 this means we cant
+reject our null hypothesis
 
 ```{r}
-# what is code without comments
-print("exercise 1.a code here!")
+male_below_2600 = 34
+female_below_2600 = 28
 
+male_total = 95
+female_total = 91
+
+# Create vectors of the data
+prop.test(c(male_below_2600,female_below_2600), c(male_total,female_total))
 ```
 
 ## Exercise 2
-
 ```{r}
 fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0)) 
 attach(fat)
@@ -86,7 +103,6 @@ p=2*min(p1,pr); p
 #conclusion indeed significant difference
 
 ```
-
 **c)**
 
 ```{r}
@@ -99,7 +115,6 @@ p=2*min(p1,pr); p
 ```{r}
 
 ```
-
 ## Exercise 3
 
 Here is the part for exercise 3 **a)**
