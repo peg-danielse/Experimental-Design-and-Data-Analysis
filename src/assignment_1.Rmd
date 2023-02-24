@@ -88,11 +88,21 @@ Our p-value of 0.568 is higher then alpha of 0.05 this means we cant
 reject our null hypothesis
 
 ```{r}
+female_below_2600 = 28
+male_below_2600 =34
 male_total = 95
-female_total = 91
+female_total = 93
 
 # Create vectors of the data
 prop.test(c(male_below_2600,female_below_2600), c(male_total,female_total))
+```
+
+```{r}
+male_weights <- c(rep(NA,34),rep(NA,61))
+female_weights <- c(rep(NA,28),rep(NA,65))
+
+t.test(male_weights, female_weights, var.equal = TRUE)
+
 ```
 
 ## Exercise 2
@@ -202,10 +212,6 @@ diet = read.table("../datasets/diet.txt", header = TRUE)
 Here is the part for exercise 3 **a)**
 
 ```{r}
-# what is code without comments
-diet <- read.table("../datasets/diet.txt", header = TRUE)
-
-
 par(mfrow=c(1,2))
 boxplot(x = diet$weight6weeks,xlab= "Weight 6 weeks" )
 boxplot(x = diet$preweight,  xlab= "Pre-weight")
@@ -219,6 +225,14 @@ qqline(diet$weight6weeks - diet$preweight)
 t.test(diet$preweight, diet$weight6weeks, paired = TRUE)
 ```
 
+**b)**
+
+```{r}
+dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet))
+dietanov=lm(weight~diet ,data = dietframe)
+anova(dietanov)
+```
+
 ## Exercise 4
 
 Here is the part for exercise 4 **a)**
@@ -226,5 +240,5 @@ Here is the part for exercise 4 **a)**
 ```{r}
 # what is code without comments
 print("exercise 4.a code here!")
-
+# 
 ```
