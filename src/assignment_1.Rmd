@@ -130,6 +130,14 @@ for(i in 1:B){
 print(mean(pstar))
 ```
 
+```{r}
+male_weights <- c(rep(NA,34),rep(NA,61))
+female_weights <- c(rep(NA,28),rep(NA,65))
+
+t.test(male_weights, female_weights, var.equal = TRUE)
+
+```
+
 ## Exercise 2
 
 ```{r}
@@ -200,29 +208,6 @@ statistic that expresses difference between the samples. This means that
 for the before and after data we can perform this test is the data is
 independent. The before and after data are independent therefore we
 might perform a permutation test.
-
-```{r}
-#TODO: REMOVE THIS
-permStat = function(x, y) { mean(x-y) }
-
-B = 1000; tstar=numeric(B);
-i =0
-for(i in i:B) {
-  cbind = cbind(before, after)
-  fStar = t(apply(cbind,1,sample))
-  tstar[i] = permStat(fStar[,1], fStar[,2]) 
-}
-
-t = permStat(before, after)
-
-hist(tstar, xlim = c(-0.6,0.6))
-lines(rep(t,2), c(0,20), col = "red", lwd=2)
-p1=sum(tstar<t)/B
-pr=sum(tstar>t)/B
-p=2*min(p1,pr); p
-#conclusion indeed significant difference
-
-```
 
 **c)**
 
@@ -307,9 +292,82 @@ diet = read.table("../datasets/diet.txt", header = TRUE)
 Here is the part for exercise 3 **a)**
 
 ```{r}
-# what is code without comments
+par(mfrow=c(1,2))
+boxplot(x = diet$weight6weeks,xlab= "Weight 6 weeks" )
+boxplot(x = diet$preweight,  xlab= "Pre-weight")
 
+#Check for if data is normaly distributed
+hist(diet$weight6weeks - diet$preweight, main = "Difference in weight after 6 weeks", xlab = "Difference")
+qqnorm(diet$weight6weeks - diet$preweight)
+qqline(diet$weight6weeks - diet$preweight)
+
+
+t.test(diet$preweight, diet$weight6weeks, paired = TRUE)
 ```
+
+**b)**
+
+Our goal is to use one-way ANOVA test to compare the diets. We first
+draw QQ-plot to check if we can assume normality this seems to be the
+case so go over to our hypothesis.
+
+-   Null hypothesis: The means of the lost weight are equal among the
+    three types of diets.
+
+-   Alternative hypothesis: The means of the lost weight are not equal
+    among the three types of diets.
+
+    Our p-value of 0.832 is greater than our significance level of 0.05
+    this means we can not reject our null hypothesis \
+    The Kruskal-Wallis is also valid because it has the same
+    pre-conditions as the anova test the difference is that
+    Kruskal-Wallis test can also be used when normality fails
+
+```{r}
+dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet))
+dietanov=lm(weight~diet ,data = dietframe)
+anova(dietanov)
+par(mfrow=c(1,2)); qqnorm(residuals(dietanov))
+qqline(residuals(dietanov))
+plot(fitted(dietanov),residuals(dietanov))
+```
+
+**c )**
+
+Our goal is to use two-way ANOVA test to compare the diets. We first
+draw QQ-plot to check if we can assume normality this seems to be the
+case so we can go over to our hypothesis.
+
+-   Null hypothesis: The means of the lost weight are equal among the
+    three types of diets.
+
+-   Alternative hypothesis: The means of the lost weight are not equal
+    among the three types of diets.
+
+Our p-value based on interaction between the parameters is 0.758 is
+greater than our significance level of 0.05 this means we can not reject
+our null hypothesis. There seems to be no interaction between the
+interaction those variables have on response variable. Although gender
+seems to have an effect on weight loss.
+
+```{r}
+dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet), gender=factor(diet$gender))
+dietanov=lm(weight~diet*gender ,data = dietframe)
+anova(dietanov)
+par(mfrow=c(1,2))
+qqnorm(residuals(dietanov))
+plot(fitted(dietanov), residuals(dietanov))
+```
+
+**d ) Dropped**
+
+**e )**
+
+⚠️**Ome Paul kijk hier nog even na ⚠️**
+
+We prefer the use of the one-way anova-test, because it focusses on
+relation between one two variables which makes more clear to spot a
+relation.
 
 ## Exercise 4
 
@@ -318,5 +376,5 @@ Here is the part for exercise 4 **a)**
 ```{r}
 # what is code without comments
 print("exercise 4.a code here!")
-
+# 
 ```
