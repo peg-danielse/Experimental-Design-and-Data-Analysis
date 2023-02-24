@@ -59,8 +59,20 @@ Here is the part for exercise 3 **a)**
 
 ```{r}
 # what is code without comments
-print("exercise 3.a code here!")
+diet <- read.table("../datasets/diet.txt", header = TRUE)
 
+
+par(mfrow=c(1,2))
+boxplot(x = diet$weight6weeks,xlab= "Weight 6 weeks" )
+boxplot(x = diet$preweight,  xlab= "Pre-weight")
+
+#Check for if data is normaly distributed
+hist(diet$weight6weeks - diet$preweight, main = "Difference in weight after 6 weeks", xlab = "Difference")
+qqnorm(diet$weight6weeks - diet$preweight)
+qqline(diet$weight6weeks - diet$preweight)
+
+
+t.test(diet$preweight, diet$weight6weeks, paired = TRUE)
 ```
 
 ## Exercise 4
