@@ -10,13 +10,15 @@ editor_options:
 ---
 
 ## Exercise 1
-Here is the part for exercise 1
+
+**a)**
 
 ```{r}
 birthweight = read.table(file="../datasets/birthweight.txt", header=FALSE)
 birthweight <- birthweight[2:189,]
 birthweight <- as.numeric(unlist(birthweight))
 ```
+
 -   Null hypothesis (H0): The mean weight is the same for male and
     female babies.
 
@@ -85,35 +87,79 @@ upper_bound = p_hat + error_margin
 
 **e)**
 
-```{r}
-male_total = 95
-female_total = 91
+To test if there is a difference in mean between the male and female
+birth weights we will need to create a bootstrap test that samples from
+the male and female distributions in the proportions given.
 
-# Create vectors of the data
-prop.test(c(male_below_2600,female_below_2600), c(male_total,female_total))
+-   H_null = mean(female) = mean(male)
+
+-   H_alt = mean(female) =/= mean(male)
+
+The male and female data gets constructed from the birth weight data set
+by sampling from the birth weight less than, and greater than 2600 gram
+with the proportions given. This allows us to do a t.test and retrieve
+the p-value. We repeat this 1000 times and average the p-value. this
+gives us an average p-value of \~0.5. With a confidence level of 95%
+(alpha=0.05) we can conclude that we cannot reject the null hypothesis
+and that there is no significant difference between the male and female
+birth weight.
+
+```{r}
+small<-birthweight[birthweight<2600]
+great<-birthweight[birthweight>2600]
+
+B=1000
+female_means = numeric(B)
+male_means = numeric(B)
+pstar = numeric(B)
+
+for(i in 1:B){
+  sf1<-sample(small, 28)
+  sf2<-sample(great, 65)
+  f<-append(sf1,sf2)
+  
+  sm1<-sample(small,34)
+  sm2<-sample(great,61)
+  m<-append(sm1,sm2)
+  
+  female_means[i] = mean(f)
+  male_means[i] = mean(m)
+  pstar[i] = t.test(m,f)$p.value
+}
+
+print(mean(pstar))
 ```
 
 ## Exercise 2
+
 ```{r}
-fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0)) 
-attach(fat)
+fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0));
+attach(fat);
 ```
 
 **a)**
 
-To investigate the data set we create a box plot of both columns. Judging from this we can observe a possible difference. the mean of the data from after 8 weeks appears to be lower.
+To investigate the data set we create a box plot of both columns.
+Judging from this we can observe a possible difference. the mean of the
+data from after 8 weeks appears to be lower.
 
 ```{r}
 boxplot(fat)
 ```
 
-Next we plot a normal Q-Q plot to check if the data is normally distributed. this appears to be the case.
+Next we plot a normal Q-Q plot to check if the data is normally
+distributed. this appears to be the case.
 
 ```{r}
 par(mfrow = c(1,2)); qqnorm(before); qqnorm(after)
 ```
 
-To check if the before and after 8 weeks data is correlated we can plot the two data sets against each other. The plot shows a clear linear correlation between before and after. Then we can confirm this with both the Pearson's and Spearman's correlation test. Both of these give the conclusion that there indeed is a correlation and it is a strong correlation with **an r value of 0.99.**
+To check if the before and after 8 weeks data is correlated we can plot
+the two data sets against each other. The plot shows a clear linear
+correlation between before and after. Then we can confirm this with both
+the Pearson's and Spearman's correlation test. Both of these give the
+conclusion that there indeed is a correlation and it is a strong
+correlation with **an r value of 0.99.**
 
 ```{r}
 plot(before~after)
@@ -122,35 +168,52 @@ cor.test(before, after)
 cor.test(before, after, method="spearman")
 ```
 
-**b)**  Apply two relevant tests (cf. Lectures 2, 3) to verify whether the diet with low fat margarine has an effect (argue whether the data are paired or not). Is a permutation test applicable?
+**b)**
 
-Since the data is collected from the same patient before and after 8 weeks it is clear the data is paired. We can therefore perform a t-test to investigate whether there is a difference in the mean of the before and after data.
+Since the data is collected from the same patient before and after 8
+weeks it is clear the data is paired. We can therefore perform a t-test
+to investigate whether there is a difference in the mean of the before
+and after data.
+
+-   H_null : mean(before) = mean(after)
+-   H_alt : mean(before) \> mean(after)
+
+Performing a t.test gives us a p-value of 1.639e-11 this is smaller than
+our significance level of 0.05 and we can therefore reject the null
+hypothesis. The before data has a mean that is greater than the mean of
+the after data.
 
 ```{r}
 t.test(before, after, alternative="greater", paired = TRUE)
 ```
 
-This shows that there is an actual difference in mean between the before and after data.
-
-We also perform a Wilcoxon signed rank test to check if the same conclusion will be drawn. This test concludes the same. There is a significant difference in mean between the before and after data.
+We also perform a Wilcoxon signed rank test to check if the same
+conclusion can be drawn. The test gives us a p-value of 3.815e-06. with
+significance level of 0.05 we can reject the null hypothesis again.
 
 ```{r}
-wilcox.test(before, after, alternative = "greater")
+wilcox.test(before, after, alternative = "greater", paired = TRUE)
 ```
 
+A permutation test is applicable for independent samples with any test
+statistic that expresses difference between the samples. This means that
+for the before and after data we can perform this test is the data is
+independent. The before and after data are independent therefore we
+might perform a permutation test.
+
 ```{r}
+#TODO: REMOVE THIS
 permStat = function(x, y) { mean(x-y) }
 
 B = 1000; tstar=numeric(B);
 i =0
 for(i in i:B) {
   cbind = cbind(before, after)
-  fatStar = t(apply(cbind,1,sample))
-  tstar[i] = permStat(fatStar[,1], fatStar[,2]) 
+  fStar = t(apply(cbind,1,sample))
+  tstar[i] = permStat(fStar[,1], fStar[,2]) 
 }
 
 t = permStat(before, after)
-print(t)
 
 hist(tstar, xlim = c(-0.6,0.6))
 lines(rep(t,2), c(0,20), col = "red", lwd=2)
@@ -160,18 +223,81 @@ p=2*min(p1,pr); p
 #conclusion indeed significant difference
 
 ```
+
 **c)**
 
-```{r}
-# bootstrap test to find out if fat$after is uniformly distributed. and construct a 95% confidence interval. (Kolmogorov-Smirnov?)
+The estimator of theta we find by computing max(after). Now we can find
+the confidence interval for this estimator by the bootstrapped
+confidence interval method. This gives us a confidence interval of
+[7.67, 8.38]
 
+```{r}
+B=1000
+T1 = max(after)
+Tstar=numeric(B)
+c1 = after
+
+for(i in 1:B) {
+  Xstar=sample(c1,replace=TRUE)
+  Tstar[i]=max(Xstar)
+}
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+
+c(2*T1-Tstar975,2*T1-Tstar25)
 ```
 
 **d)**
 
+To determine for which thetas we cannot reject that our estimate
+
+-   h0: p(after) = unif(3,theta) where theta in [3, 12]
+
+-   h1: p(after) =\\= unif(3,theta) where theta in [3, 12]
+
+We performed the bootstrap test for the values for theta in 3 ... 12.
+For the values inside the bootstrapped confidence interval we cannot
+reject the null hypothesis.
+
+the Kolmogorov-Smirnoff (KS) test can be used to perform this analysis.
+This can be done by generating data from the uniform distribution and
+performing the KS test on the generated data and the after data.
+
 ```{r}
+data = after
+n=length(data); t=max(data); t
+
+B=1000; tstar=numeric(B)
+for (i in 1:B) {
+  xstar=runif(n, 3, 9)
+  tstar[i]=max(xstar)
+}
+
+pl=sum(tstar<t)/B;
+pr=sum(tstar>t)/B
+p=2*min(pl,pr); p
 
 ```
+
+**e)**
+
+Using the sign test we are test if H0: median(after) = 6. with H1:
+median(after ) \< 6. Performing the test gives us a p-value of 0.61111
+this is not lower than our significance level of 0.05 and therefore we
+cannot reject the null hypothesis.
+
+```{r}
+x = sum(after<6)
+n = length(after<6)
+binom.test(x, n, x/n, "l")
+```
+
+Next to the wilcox.
+
+```{r}
+?wilcox.test(after,mu=6
+```
+
 ## Exercise 3
 
 ```{r}
