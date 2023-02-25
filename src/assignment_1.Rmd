@@ -87,55 +87,33 @@ confidence_level = 1 - alpha
 
 **e)**
 
-To test if there is a difference in mean between the male and female
-birth weights we will need to create a bootstrap test that samples from
-the male and female distributions in the proportions given.
+To test the claim that there is a difference in the mean birth weight of
+male and female babies are different we can perform a prop test on the
+proportions of males and females that are born with a weight below 2600
+gram.
 
--   H_null = mean(female) = mean(male)
+-   H_null : There is no difference in proportion between male and
+    female babies born with a weight less than 2600.
 
--   H_alt = mean(female) =/= mean(male)
+-   H_alt : There is a difference in proportion between male and female
+    babies born with a weight less than 2600.
 
-The male and female data gets constructed from the birth weight data set
-by sampling from the birth weight less than, and greater than 2600 gram
-with the proportions given. This allows us to do a t.test and retrieve
-the p-value. We repeat this 1000 times and average the p-value. this
-gives us an average p-value of \~0.5. With a confidence level of 95%
-(alpha=0.05) we can conclude that we cannot reject the null hypothesis
-and that there is no significant difference between the male and female
-birth weight.
+This test concludes with a p-value of \~0.5 and therefore we cannot
+reject the null hypothesis.
 
-```{r}
-small<-birthweight[birthweight<2600]
-great<-birthweight[birthweight>2600]
-
-B=1000
-female_means = numeric(B)
-male_means = numeric(B)
-pstar = numeric(B)
-
-for(i in 1:B){
-  sf1<-sample(small, 28)
-  sf2<-sample(great, 65)
-  f<-append(sf1,sf2)
-  
-  sm1<-sample(small,34)
-  sm2<-sample(great,61)
-  m<-append(sm1,sm2)
-  
-  female_means[i] = mean(f)
-  male_means[i] = mean(m)
-  pstar[i] = t.test(m,f)$p.value
-}
-
-print(mean(pstar))
-```
+We can not directly reject the claim that there is a difference in the
+mean birth weight between male and female babies because we cannot
+directly measure this. However, we also have not found evidence for it
+in the given proportions.
 
 ```{r}
-male_weights <- c(rep(NA,34),rep(NA,61))
-female_weights <- c(rep(NA,28),rep(NA,65))
+male_weights <- c(34, 61)
+female_weights <- c(28, 65)
 
-t.test(male_weights, female_weights, var.equal = TRUE)
+x<-c(male_weights[1],female_weights[1])
+y<-c(sum(male_weights),sum(female_weights))
 
+prop.test(x, y)
 ```
 
 ## Exercise 2
