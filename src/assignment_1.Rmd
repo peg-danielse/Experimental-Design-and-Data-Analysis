@@ -323,7 +323,21 @@ Next to the wilcox.
 diet = read.table("../datasets/diet.txt", header = TRUE)
 ```
 
-Here is the part for exercise 3 **a)**
+**a)**
+
+We check the data by making boxplots for both pre-weight and weight
+after 6 weeks. There seems to be a difference. we check normality for
+the difference between the pre-weight and the after 6 weeks weight this
+seems to be normal. Lastly, we want to investigate if there is a
+significant difference between the mean weight before and after. We
+perform a T-test with significance level of 95% and hypotheses:
+
+-   h0: μ1 = μ2
+
+-   h1: μ1 =/= μ2
+
+The test rejects h0, therefore we can assume that there is a difference
+in the mean weight before and after the diet.
 
 ```{r}
 par(mfrow=c(1,2))
@@ -339,69 +353,95 @@ qqline(diet$weight6weeks - diet$preweight)
 t.test(diet$preweight, diet$weight6weeks, paired = TRUE)
 ```
 
+\
+
 **b)**
 
 Our goal is to use one-way ANOVA test to compare the diets. We first
 draw QQ-plot to check if we can assume normality this seems to be the
-case so go over to our hypothesis.
+case so we perform ANOVA with the Hypotheses:
 
 -   Null hypothesis: The means of the lost weight are equal among the
     three types of diets.
 
--   Alternative hypothesis: The means of the lost weight are not equal
-    among the three types of diets.
+-   Alternative hypothesis: The mean of at least one diet-type is not
+    equal among the three types of diets.
 
-    Our p-value of 0.832 is greater than our significance level of 0.05
-    this means we can not reject our null hypothesis\
-    The Kruskal-Wallis is also valid because it has the same
-    pre-conditions as the anova test the difference is that
-    Kruskal-Wallis test can also be used when normality fails
+The ANOVA
+
+Looking at the summary of the anova table we can see clearly that the
+p-value of diet 3 is smaller than our significance level of 0.05.
+Therefor we reject the null hypothesis and assume that there is a
+difference between the diets. All diets have and effect this is shown in
+subquestion a. Diet 3 has the biggest effect on the weight lost.
+
+The Kruskal-Wallis is also valid because it has the same pre-conditions
+as the anova test the difference is that Kruskal-Wallis test can also be
+used when normality cannot be assumed.
 
 ```{r}
-dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet))
+dietframe <- data.frame(weight=(diet$preweight-diet$weight6weeks), diet=factor(diet$diet))
 dietanov=lm(weight~diet ,data = dietframe)
 anova(dietanov)
+summary(dietanov)
 par(mfrow=c(1,2)); qqnorm(residuals(dietanov))
 qqline(residuals(dietanov))
 plot(fitted(dietanov),residuals(dietanov))
 ```
 
+\
+\
+
 **c )**
 
-Our goal is to use two-way ANOVA test to compare the diets. We first
-draw QQ-plot to check if we can assume normality this seems to be the
-case so we can go over to our hypothesis.
+Our goal is to use two-way ANOVA test to investigate the effects on
+gender and different diets on the mean lost weight. We first draw
+QQ-plot to check if we can assume normality this seems to be the case so
+we can go over to our hypothesis.
 
 -   Null hypothesis: The means of the lost weight are equal among the
-    three types of diets.
+    factors.
 
 -   Alternative hypothesis: The means of the lost weight are not equal
-    among the three types of diets.
+    for at least one factor.
 
-Our p-value based on interaction between the parameters is 0.758 is
-greater than our significance level of 0.05 this means we can not reject
-our null hypothesis. There seems to be no interaction between the
-interaction those variables have on response variable. Although gender
-seems to have an effect on weight loss.
+The result of the ANOVA test is that we can reject the null hypothesis.
+There is a difference between the means of the lost weight. There also
+is a small significant interaction between diet and gender with a
+p-value of \~0.048. Looking at the summary we can see that this is not a
+specific interaction between a specific diet type and gender but a
+general effect that gender has on all diet types.
 
 ```{r}
-dietframe <- data.frame(weight=diet$weight6weeks, diet=factor(diet$diet), gender=factor(diet$gender))
-dietanov=lm(weight~diet*gender ,data = dietframe)
-anova(dietanov)
+dgframe <- data.frame(weight=diet$preweight - diet$weight6weeks, diet=factor(diet$diet), gender=factor(diet$gender))
+dganov=lm(weight~diet*gender ,data = dgframe)
+anova(dganov)
+summary(dganov)
 par(mfrow=c(1,2))
-qqnorm(residuals(dietanov))
-plot(fitted(dietanov), residuals(dietanov))
-```
+qqnorm(residuals(dganov))
+plot(fitted(dganov), residuals(dganov))
 
-**d ) Dropped**
+```
 
 **e )**
 
-⚠️**Ome Paul kijk hier nog even na ⚠️**
+Whether we want to use one-way or two-way ANOVA depends on what we want
+to investigate. If we want to see the effects of different diets on
+weight loss one-way ANOVA would be sufficient. However if we are
+interested in the effect of gender on the effectiveness of diet this
+one-way model could not work. Therefor we would have to use two-way
+ANOVA. Because we only want to predict the lost weight achieved by
+diet-type we are going to use the same linear model we used for one-way
+ANOVA to predict weight loss for the different diet-types.
 
-We prefer the use of the one-way anova-test, because it focuses on
-relation between one two variables which makes more clear to spot a
-relation.
+```{r}
+summary(dietanov)
+```
+
+Looking at the summary for the ANOVA model we can see that the estimate
+average weight difference between the before and after. This would mean
+that for diet 1 the prediction for the weight loss will be 3.3 kg. For
+diet 2: 3.1kg, and for diet 3: 5.1kg.
 
 ## Exercise 4
 
