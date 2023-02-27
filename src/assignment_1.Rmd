@@ -499,11 +499,12 @@ interaction.plot(npk$block, npk$N, npk$yield, xlab = "block", ylab = "yield", tr
 The p-value for block is not significant therefore we cannot reject H0.
 The p-value for nitrogen is significant however and that means we can
 reject H0 and accept Ha. It is sensible to include the block factor in
-the test because the yield of the block is dependent of what additives
-is received by each plot in the block. For a Friedman test the variable
-need a similar spread across the different variable groups. However
-there is not necessarily a similar spread between blocks and nitrogen so
-we cannot apply a Friedman test in this case.
+the model because the yield is source of variation by including it we
+can account for this variation and better estimate the effect nitrogen.
+
+The Friedman test can't be used because the Friedman test is
+non-parametric test for comparing two groups on a dependent variable.
+However here we have two groups and a response variable.
 
 ```{r}
 npk$block = as.factor(npk$block)
@@ -519,6 +520,11 @@ plot(fitted(npkanov), residuals(npkanov))
 
 **d)**
 
+We did a investigation on the significance of the variables. And removed
+each iteration the least significant value from the model. At the end we
+only had Nitrogen left and because it the only factor with significance
+relation we have chosen it as our favorite.
+
 ```{r}
 npk$block = as.factor(npk$block)
 npk$N = as.factor(npk$N)
@@ -527,10 +533,15 @@ npk$K = as.factor(npk$K)
 
 giganov = lm(yield~block+N+P+K, data = npk)
 anova(giganov)
-# summary(giganov)
-# par(mfrow=c(1,2))
-# qqnorm(residuals(giganov))
-# plot(fitted(giganov), residuals(giganov))
+par(mfrow=c(1,2))
+qqnorm(residuals(giganov))
+plot(fitted(giganov), residuals(giganov))
+
+
+model1 = lm(yield~block+N+K, data = npk)
+anova(model1)
+model2 = lm(yield~block+N, data = npk)
+anova(model2)
 ```
 
 **e)**
