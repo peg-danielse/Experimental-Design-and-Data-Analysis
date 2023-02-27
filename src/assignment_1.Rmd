@@ -352,8 +352,6 @@ qqline(diet$weight6weeks - diet$preweight)
 t.test(diet$preweight, diet$weight6weeks, paired = TRUE)
 ```
 
-\
-
 **b)**
 
 Our goal is to use one-way ANOVA test to compare the diets. We first
@@ -387,9 +385,6 @@ par(mfrow=c(1,2)); qqnorm(residuals(dietanov))
 qqline(residuals(dietanov))
 plot(fitted(dietanov),residuals(dietanov))
 ```
-
-\
-\
 
 **c )**
 
@@ -477,10 +472,59 @@ for(i in 1:24){
 colnames(plots) = c("N","P", "K", "Blocks")
 ```
 
+**b)**
+
+By looking at every block you get a more precise picture of the
+different combinations. Because different blocks have different
+combinations of additives applied. This way you can determine the effect
+the other additives have on the yield.
+
 ```{r}
 par(mfrow=c(1,2))
-nitrogen = npk[npk$N == 1, ]
-no_nitrogen = npk[npk$N == 0,]
-boxplot(nitrogen$yield~nitrogen$block)
-boxplot(no_nitrogen$yield~no_nitrogen$block)
+interaction.plot(npk$N, npk$block, npk$yield, xlab = "nitrogen", ylab = "yield", trace.label = "block")
+interaction.plot(npk$block, npk$N, npk$yield, xlab = "block", ylab = "yield", trace.label = "nitrogen")
+```
+
+**c)**
+
+-   Null hypothesis: The means of the yield are equal among the factors.
+
+-   Alternative hypothesis: The means of the yield are not equal for at
+    least one factor.
+
+The p-value for block is not significant therefore we cannot reject H0.
+The p-value for nitrogen is significant however and that means we can
+reject H0 and accept Ha. It is not sensible to include the block factor
+in the test because the yield of the block is dependent of what
+additives is received by each plot in the block. For a Friedman test the
+variable need a similar spread across the different variable groups.
+However there is not necessarily a similar spread between blocks and
+nitrogen so we cannot apply a Friedman test in this case.
+
+```{r}
+npk$block = as.factor(npk$block)
+npk$N = as.factor(npk$N)
+
+npkanov = lm(yield~block*N, data=npk)
+anova(npkanov)
+summary(npkanov)
+par(mfrow=c(1,2))
+qqnorm(residuals(npkanov))
+plot(fitted(npkanov), residuals(npkanov))
+```
+
+**d)**
+
+```{r}
+npk$block = as.factor(npk$block)
+npk$N = as.factor(npk$N)
+npk$P = as.factor(npk$P)
+npk$K = as.factor(npk$K)
+
+giganov = lm(yield~block+N+P+K, data = npk)
+anova(giganov)
+# summary(giganov)
+# par(mfrow=c(1,2))
+# qqnorm(residuals(giganov))
+# plot(fitted(giganov), residuals(giganov))
 ```
