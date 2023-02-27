@@ -498,12 +498,12 @@ interaction.plot(npk$block, npk$N, npk$yield, xlab = "block", ylab = "yield", tr
 
 The p-value for block is not significant therefore we cannot reject H0.
 The p-value for nitrogen is significant however and that means we can
-reject H0 and accept Ha. It is not sensible to include the block factor
-in the test because the yield of the block is dependent of what
-additives is received by each plot in the block. For a Friedman test the
-variable need a similar spread across the different variable groups.
-However there is not necessarily a similar spread between blocks and
-nitrogen so we cannot apply a Friedman test in this case.
+reject H0 and accept Ha. It is sensible to include the block factor in
+the test because the yield of the block is dependent of what additives
+is received by each plot in the block. For a Friedman test the variable
+need a similar spread across the different variable groups. However
+there is not necessarily a similar spread between blocks and nitrogen so
+we cannot apply a Friedman test in this case.
 
 ```{r}
 npk$block = as.factor(npk$block)
