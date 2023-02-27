@@ -11,13 +11,15 @@ editor_options:
 
 ## Exercise 1
 
-**a)**
-
 ```{r}
 birthweight = read.table(file="../datasets/birthweight.txt", header=FALSE)
 birthweight <- birthweight[2:189,]
 birthweight <- as.numeric(unlist(birthweight))
 ```
+
+**a)** To check the data for normality we used a Shapiro-Wilk test. This
+test tests the null hypothesis that a sample from an unknown
+distribution is normal.
 
 -   Null hypothesis (H0): The mean weight is the same for male and
     female babies.
@@ -25,25 +27,69 @@ birthweight <- as.numeric(unlist(birthweight))
 -   Alternative hypothesis (Ha): The mean weight is different for male
     and female babies.
 
-Our p-value of 0.56 is higher then alpha of 0.05 this means we cant
-reject our null hypothesis
+Our p-value of 0.90 is higher then the confidence level of 0.05 this
+means we cannot reject our null hypothesis. This hypothesis is
+complemented by the QQ-plot and histogram of the data that both
+approximate a normal distribution.
 
 ```{r}
 # check normality
 shapiro.test(birthweight)
+par(mfrow=c(1,2))
 qqnorm(birthweight)
- 
-# 96%-CI
-t.test(birthweight, mu=0, conf.level = 0.96)
+hist(birthweight)
+```
 
+Assuming normality we can construct a 96%-CI for the mean. We
+constructed the CI using a t-test with a confidence level of 0.96. The
+resulting confidence interval is [2808.08, 3018,50].
+
+```{r}
+# 96%-CI
+m = mean(birthweight)
+t.test(birthweight, mu=m, conf.level = 0.96)
+```
+
+The sample size needed to provide that the length of the CI is at most
+100, is the sample size needed to get a CI of μ +/- 100/2. The sample
+size necessary is 550.
+
+```{r}
 #sample size needed for CI length of 100
 e = 100/mean(birthweight)
 qnorm(0.98)^2*0.96*0.04/(e/2)^2
+```
 
-#paul had de bootstrap
+The bootstrap CI is very similar to the CI that we got with the t-test
+it is just a fraction smaller. Which could mean that the bootstrap
+interval is more robust than the t-test interval.
+
+```{r}
+#bootstrap
+B=1000
+Tstar = numeric(B)
+for(i in 1:B){
+  Xstar = sample(birthweight, replace=TRUE)
+  Tstar[i] = mean(Xstar)
+}
+Tstar2 = quantile(Tstar, 0.02)
+Tstar98 = quantile(Tstar, 0.98)
+sum(Tstar<Tstar2)
+c(2*m - Tstar98, 2*m - Tstar2)
 ```
 
 **b)**
+
+To verify the claim we do a t-test with H0: μ = 2800 and Ha: μ \> 2800.
+The result of the t-test has a p-value of 0.014, which is smaller than
+alpha. This means we can reject H0, and Ha is accepted. The test also
+tells us that there is a probability of 95% that the mean is greater
+than 2819.20. For an appropriate sign-test we check the number of
+observations that are greater than 2800 and the total number of
+observations in the data set. With H0: μ = 2800 and Ha: μ \> 2800. The
+result of the sign-test has a p-value of 0.033, so H0 is rejected. The
+results tell us that the number of observations that are greater than
+2800 is greater than the number of total observations divided by two.
 
 ```{r}
 #t-test to verify mean weight is bigger than 2800
@@ -54,6 +100,13 @@ binom.test(sum(birthweight>2800), length(birthweight), alternative = "g")
 ```
 
 **c)**
+
+We can test the power of the test by simulation. By generating data and
+checking the fraction of the sample where H0 is rejected. The powers of
+the test tell us that the t-test performs better than the sign-test.
+This is because the sign-test is a non-parametric test, which means it
+makes very few assumption about the data but this can also lead to a
+lack of statistical power.
 
 ```{r}
 #geen idee of dit goed is
@@ -73,6 +126,9 @@ sum(psign<0.05)/B
 ```
 
 **d)**
+
+The confidence interval for P(X\<2600) is [0.25, 0.41], with a
+confidence level of 0.98.
 
 ```{r}
 n = length(birthweight)
@@ -343,16 +399,19 @@ plot(fitted(dietanov), residuals(dietanov))
 
 ⚠️**Ome Paul kijk hier nog even na ⚠️**
 
-We prefer the use of the one-way anova-test, because it focusses on
+We prefer the use of the one-way anova-test, because it focuses on
 relation between one two variables which makes more clear to spot a
 relation.
 
 ## Exercise 4
 
+```{r}
+npk
+```
+
 Here is the part for exercise 4 **a)**
 
 ```{r}
 # what is code without comments
-print("exercise 4.a code here!")
-# 
+
 ```
