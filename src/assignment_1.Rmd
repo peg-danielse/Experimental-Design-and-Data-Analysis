@@ -532,3 +532,17 @@ anova(giganov)
 # qqnorm(residuals(giganov))
 # plot(fitted(giganov), residuals(giganov))
 ```
+
+**e)**
+
+The output of the mixed effect analysis will generally return a smaller
+standard error than that of the fixed effects model because the mixed
+effects model also accounts for variation that is caused by the
+difference of the blocks. Furthermore we can use the random effect of
+the block to estimate the variance in yield.
+
+```{r}
+library(lme4)
+npklmer=lmer(yield ~ N + (1|block), data = npk)
+summary(npklmer)
+```
