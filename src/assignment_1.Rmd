@@ -440,8 +440,13 @@ summary(dietanov)
 
 Looking at the summary for the ANOVA model we can see that the estimate
 average weight difference between the before and after. This would mean
-that for diet 1 the prediction for the weight loss will be 3.3 kg. For
-diet 2: 3.1kg, and for diet 3: 5.1kg.
+that the prediction for the weight loss after 6 weeks will be:
+
+| Col1   | Col2   |
+|--------|--------|
+| diet 1 | 3.3 kg |
+| diet 2 | 3.1 kg |
+| diet 3 | 5.1 kg |
 
 ## Exercise 4
 
