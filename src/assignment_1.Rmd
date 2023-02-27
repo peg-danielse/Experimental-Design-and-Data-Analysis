@@ -148,11 +148,11 @@ male and female babies are different we can perform a prop test on the
 proportions of males and females that are born with a weight below 2600
 gram.
 
--   H_null : There is no difference in proportion between male and
-    female babies born with a weight less than 2600.
+-   Null hypothesis (H0) : There is no difference in proportion between
+    male and female babies born with a weight less than 2600.
 
--   H_alt : There is a difference in proportion between male and female
-    babies born with a weight less than 2600.
+-   Alternative hypothesis (Ha) : There is a difference in proportion
+    between male and female babies born with a weight less than 2600.
 
 This test concludes with a p-value of \~0.5 and therefore we cannot
 reject the null hypothesis.
@@ -182,7 +182,7 @@ attach(fat);
 **a)**
 
 To investigate the data set we create a box plot of both columns.
-Judging from this we can observe a possible difference. the mean of the
+Judging from this we can observe a possible difference. The mean of the
 data from after 8 weeks appears to be lower.
 
 ```{r}
@@ -217,8 +217,8 @@ weeks it is clear the data is paired. We can therefore perform a t-test
 to investigate whether there is a difference in the mean of the before
 and after data.
 
--   H_null : mean(before) = mean(after)
--   H_alt : mean(before) \> mean(after)
+-   Null hypothesis (H0) : mean(before) = mean(after)
+-   Alternative hypothesis (Ha) : mean(before) \> mean(after)
 
 Performing a t.test gives us a p-value of 1.639e-11 this is smaller than
 our significance level of 0.05 and we can therefore reject the null
@@ -269,9 +269,9 @@ c(2*T1-Tstar975,2*T1-Tstar25)
 
 To determine for which θs we cannot reject that our estimate
 
--   h0: p(after) = unif(3,θ) where θ in [3, 12]
+-   Null hypothesis (H0): p(after) = unif(3,θ) where θ in [3, 12]
 
--   h1: p(after) ≠ unif(3,θ) where θ in [3, 12]
+-   Alternative hypothesis (Ha): p(after) ≠ unif(3,θ) where θ in [3, 12]
 
 We performed the bootstrap test for the values for θ in 3 ... 12. For
 the values inside the bootstrapped confidence interval we cannot reject
@@ -299,7 +299,7 @@ p=2*min(pl,pr); p
 
 **e)**
 
-Using the sign test we are test if H0: median(after) = 6. with H1:
+Using the sign test we are test if H0: median(after) = 6. with Ha:
 median(after ) \< 6. Performing the test gives us a p-value of 0.61111
 this is not lower than our significance level of 0.05 and therefore we
 cannot reject the null hypothesis.
@@ -325,17 +325,18 @@ diet = read.table("../datasets/diet.txt", header = TRUE)
 **a)**
 
 We check the data by making boxplots for both pre-weight and weight
-after 6 weeks. There seems to be a difference. we check normality for
-the difference between the pre-weight and the after 6 weeks weight this
-seems to be normal. Lastly, we want to investigate if there is a
-significant difference between the mean weight before and after. We
-perform a T-test with significance level of 95% and hypotheses:
+after 6 weeks. From the plots we can tell that the data appears to be
+normally distributed, we can also tell that there is a difference
+between the pre-weight and the weight after 6 weeks. Lastly, we want to
+investigate if there is a significant difference between the mean weight
+before and after. We perform a T-test with significance level of 95% and
+hypotheses:
 
--   h0: μ1 = μ2
+-   Null hypothesis (H0): μ1 = μ2
 
--   h1: μ1 =/= μ2
+-   Alternative hypothesis (Ha): μ1 ≠ μ2
 
-The test rejects h0, therefore we can assume that there is a difference
+The test rejects H0, therefore we can assume that there is a difference
 in the mean weight before and after the diet.
 
 ```{r}
@@ -358,11 +359,11 @@ Our goal is to use one-way ANOVA test to compare the diets. We first
 draw QQ-plot to check if we can assume normality this seems to be the
 case so we perform ANOVA with the Hypotheses:
 
--   Null hypothesis: The means of the lost weight are equal among the
-    three types of diets.
+-   Null hypothesis (H0): The means of the lost weight are equal among
+    the three types of diets.
 
--   Alternative hypothesis: The mean of at least one diet-type is not
-    equal among the three types of diets.
+-   Alternative hypothesis (Ha): The mean of at least one diet-type is
+    not equal among the three types of diets.
 
 The ANOVA
 
@@ -370,7 +371,7 @@ Looking at the summary of the anova table we can see clearly that the
 p-value of diet 3 is smaller than our significance level of 0.05.
 Therefor we reject the null hypothesis and assume that there is a
 difference between the diets. All diets have and effect this is shown in
-subquestion a. Diet 3 has the biggest effect on the weight lost.
+question a. Diet 3 has the biggest effect on the weight lost.
 
 The Kruskal-Wallis is also valid because it has the same pre-conditions
 as the anova test the difference is that Kruskal-Wallis test can also be
@@ -393,11 +394,11 @@ gender and different diets on the mean lost weight. We first draw
 QQ-plot to check if we can assume normality this seems to be the case so
 we can go over to our hypothesis.
 
--   Null hypothesis: The means of the lost weight are equal among the
-    factors.
+-   Null hypothesis (H0): The means of the lost weight are equal among
+    the factors.
 
--   Alternative hypothesis: The means of the lost weight are not equal
-    for at least one factor.
+-   Alternative hypothesis (Ha): The means of the lost weight are not
+    equal for at least one factor.
 
 The result of the ANOVA test is that we can reject the null hypothesis.
 There is a difference between the means of the lost weight. There also
@@ -450,6 +451,8 @@ npk
 
 **a)**
 
+We loop over all the blocks and sample 2 plots for each additive.
+
 ```{r}
 #randomized plot design
 plot=c(0,1,2,3)
@@ -470,6 +473,7 @@ for(i in 1:24){
   }
 }
 colnames(plots) = c("N","P", "K", "Blocks")
+plots
 ```
 
 **b)**
