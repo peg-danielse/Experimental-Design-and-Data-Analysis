@@ -4,17 +4,24 @@ author: "PD, JO, and MD, group 70"
 date: "17 febuary 2023"
 output: pdf_document
 highlight: tango
+fig_width: 4 
+fig_height: 3
+
 editor_options: 
   markdown: 
     wrap: 72
 ---
 
+```{r}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 4)
+```
+
 ## Exercise 1
 
 ```{r}
 birthweight = read.table(file="../datasets/birthweight.txt", header=FALSE)
-birthweight <- birthweight[2:189,]
-birthweight <- as.numeric(unlist(birthweight))
+birthweight = birthweight[2:189,]
+birthweight = as.numeric(unlist(birthweight))
 ```
 
 **a)** To check the data for normality we used a Shapiro-Wilk test. This
@@ -51,7 +58,7 @@ t.test(birthweight, mu=m, conf.level = 0.96)
 ```
 
 The sample size needed to provide that the length of the CI is at most
-100, is the sample size needed to get a CI of μ +/- 100/2. The sample
+100, is the sample size needed to get a CI of mu +/- 100/2. The sample
 size necessary is 550.
 
 ```{r}
@@ -80,13 +87,13 @@ c(2*m - Tstar98, 2*m - Tstar2)
 
 **b)**
 
-To verify the claim we do a t-test with H0: μ = 2800 and Ha: μ \> 2800.
-The result of the t-test has a p-value of 0.014, which is smaller than
-alpha. This means we can reject H0, and Ha is accepted. The test also
-tells us that there is a probability of 95% that the mean is greater
-than 2819.20. For an appropriate sign-test we check the number of
-observations that are greater than 2800 and the total number of
-observations in the data set. With H0: μ = 2800 and Ha: μ \> 2800. The
+To verify the claim we do a t-test with H0: mu = 2800 and Ha: mu \>
+2800. The result of the t-test has a p-value of 0.014, which is smaller
+than alpha. This means we can reject H0, and Ha is accepted. The test
+also tells us that there is a probability of 95% that the mean is
+greater than 2819.20. For an appropriate sign-test we check the number
+of observations that are greater than 2800 and the total number of
+observations in the data set. With H0: mu = 2800 and Ha: mu \> 2800. The
 result of the sign-test has a p-value of 0.033, so H0 is rejected. The
 results tell us that the number of observations that are greater than
 2800 is greater than the number of total observations divided by two.
@@ -96,7 +103,8 @@ results tell us that the number of observations that are greater than
 t.test(birthweight, mu=2800, alternative = "g")
 
 #sign test
-binom.test(sum(birthweight>2800), length(birthweight), alternative = "g")
+binom.test(sum(birthweight>2800), 
+           length(birthweight), alternative = "g")
 ```
 
 **c)**
@@ -175,7 +183,8 @@ prop.test(x, y)
 ## Exercise 2
 
 ```{r}
-fat = scan("../datasets/cholesterol.txt", what = list(before = 0, after = 0));
+fat = scan("../datasets/cholesterol.txt", 
+           what = list(before = 0, after = 0));
 attach(fat);
 ```
 
@@ -245,9 +254,10 @@ might perform a permutation test.
 
 **c)**
 
-The estimator of θ we find by computing max(after). Now we can find the
-confidence interval for this estimator by the bootstrapped confidence
-interval method. This gives us a confidence interval of [7.67, 8.38]
+The estimator of theta we find by computing max(after). Now we can find
+the confidence interval for this estimator by the bootstrapped
+confidence interval method. This gives us a confidence interval of
+[7.67, 8.38]
 
 ```{r}
 B=1000
@@ -267,15 +277,17 @@ c(2*T1-Tstar975,2*T1-Tstar25)
 
 **d)**
 
-To determine for which θs we cannot reject that our estimate
+To determine for which thetas we cannot reject that our estimate
 
--   Null hypothesis (H0): p(after) = unif(3,θ) where θ in [3, 12]
+-   Null hypothesis (H0): p(after) = unif(3,theta) where theta in [3,
+    12]
 
--   Alternative hypothesis (Ha): p(after) ≠ unif(3,θ) where θ in [3, 12]
+-   Alternative hypothesis (Ha): p(after) =/= unif(3,theta) where theta
+    in [3, 12]
 
-We performed the bootstrap test for the values for θ in 3 ... 12. For
-the values inside the bootstrapped confidence interval we cannot reject
-the null hypothesis.
+We performed the bootstrap test for the values for theta in 3 ... 12.
+For the values inside the bootstrapped confidence interval we cannot
+reject the null hypothesis.
 
 the Kolmogorov-Smirnoff (KS) test can be used to perform this analysis.
 This can be done by generating data from the uniform distribution and
@@ -332,9 +344,9 @@ investigate if there is a significant difference between the mean weight
 before and after. We perform a T-test with significance level of 95% and
 hypotheses:
 
--   Null hypothesis (H0): μ1 = μ2
+-   Null hypothesis (H0): mu1 = mu2
 
--   Alternative hypothesis (Ha): μ1 ≠ μ2
+-   Alternative hypothesis (Ha): mu1 =/= mu2
 
 The test rejects H0, therefore we can assume that there is a difference
 in the mean weight before and after the diet.
@@ -345,7 +357,9 @@ boxplot(x = diet$weight6weeks,xlab= "Weight 6 weeks" )
 boxplot(x = diet$preweight,  xlab= "Pre-weight")
 
 #Check for if data is normaly distributed
-hist(diet$weight6weeks - diet$preweight, main = "Difference in weight after 6 weeks", xlab = "Difference")
+hist(diet$weight6weeks - diet$preweight, main = 
+       "Difference in weight after 6 weeks", xlab = 
+       "Difference")
 qqnorm(diet$weight6weeks - diet$preweight)
 qqline(diet$weight6weeks - diet$preweight)
 
@@ -378,7 +392,8 @@ as the anova test the difference is that Kruskal-Wallis test can also be
 used when normality cannot be assumed.
 
 ```{r}
-dietframe <- data.frame(weight=(diet$preweight-diet$weight6weeks), diet=factor(diet$diet))
+dietframe <- data.frame(weight=(diet$preweight-diet$weight6weeks), 
+                        diet=factor(diet$diet))
 dietanov=lm(weight~diet ,data = dietframe)
 anova(dietanov)
 summary(dietanov)
@@ -408,7 +423,8 @@ specific interaction between a specific diet type and gender but a
 general effect that gender has on all diet types.
 
 ```{r}
-dgframe <- data.frame(weight=diet$preweight - diet$weight6weeks, diet=factor(diet$diet), gender=factor(diet$gender))
+dgframe <- data.frame(weight=diet$preweight - diet$weight6weeks, 
+                      diet=factor(diet$diet), gender=factor(diet$gender))
 dganov=lm(weight~diet*gender ,data = dgframe)
 anova(dganov)
 summary(dganov)
@@ -444,10 +460,6 @@ that the prediction for the weight loss after 6 weeks will be:
 | diet 3 | 5.1 kg |
 
 ## Exercise 4
-
-```{r}
-npk
-```
 
 **a)**
 
@@ -485,8 +497,10 @@ the other additives have on the yield.
 
 ```{r}
 par(mfrow=c(1,2))
-interaction.plot(npk$N, npk$block, npk$yield, xlab = "nitrogen", ylab = "yield", trace.label = "block")
-interaction.plot(npk$block, npk$N, npk$yield, xlab = "block", ylab = "yield", trace.label = "nitrogen")
+interaction.plot(npk$N, npk$block, npk$yield, 
+                 xlab = "nitrogen", ylab = "yield", trace.label = "block")
+interaction.plot(npk$block, npk$N, npk$yield, 
+                 xlab = "block", ylab = "yield", trace.label = "nitrogen")
 ```
 
 **c)**
