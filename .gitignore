@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 ./src/asssignment_1_files/*
+*.pdf
