@@ -1,6 +1,6 @@
 ---
 title: "assignment 2"
-author: "PD, JO, MD: 2641423 GR: 70"
+author: "PD, JO: 2672027, MD: 2641423, GR: 70"
 date: "`r Sys.Date()`"
 output: pdf_document
 editor_options: 
@@ -9,21 +9,52 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 3)
 ```
 
 ## Assignment 1
 
+```{r}
+tree = read.table("../datasets/treeVolume.txt", header=TRUE)
+```
+
 **a)**
 
-```{r}
+You can only perform a t-test if the data contains two groups. Which is
+the case for the tree volumes since there are two types of trees.
 
+```{r}
+treeframe <- data.frame(volume=(tree$volume), 
+                        type=factor(tree$type))
+treeanov=lm(volume~type ,data = treeframe)
+anova(treeanov)
+summary(treeanov)
+par(mfrow=c(1,2)); qqnorm(residuals(treeanov))
+qqline(residuals(treeanov))
+plot(fitted(treeanov),residuals(treeanov))
+```
+
+The estimated mean for the tree types is 30.171 for beeches and 35.250
+for oaks. Which is the same as the estimated mean from the anova
+summary.
+
+```{r}
+t.test(volume~type, data = tree)
 ```
 
 **b)**
 
 ```{r}
-
+treeframe <- data.frame(volume=(tree$volume), 
+                        type=factor(tree$type),
+                        diameter=(tree$diameter),
+                        height=(tree$height))
+treeanov=lm(volume~type+diameter+height+type:diameter, data = treeframe)
+anova(treeanov)
+summary(treeanov)
+# par(mfrow=c(1,2)); qqnorm(residuals(treeanov))
+# qqline(residuals(treeanov))
+# plot(fitted(treeanov),residuals(treeanov))
 ```
 
 **c)**
