@@ -1,0 +1,39 @@
+---
+title: "assignment 2"
+author: "PD, JO, MD: 2641423 GR: 70"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 1
+
+**a)**
+
+```{r}
+
+```
+
+**b)**
+
+```{r}
+
+```
+
+**c)**
+
+```{r}
+
+```
+
+**d)**
+
+```{r}
+
+```
