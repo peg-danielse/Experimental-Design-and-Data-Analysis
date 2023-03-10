@@ -12,7 +12,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 3)
 ```
 
-## Assignment 1
+## Problem 1
 
 ```{r}
 tree = read.table("../datasets/treeVolume.txt", header=TRUE)
@@ -85,5 +85,69 @@ we propose that the interaction between diameter and height will be included in 
 treeanov=lm(volume~diameter*height, data = treeframe)
 anova(treeanov)
 summary(treeanov)
+
+```
+
+## Problem 2
+
+```{r}
+crime = read.table("../datasets/expensescrime.txt", header=TRUE)
+```
+
+**a)**
+
+```{r} 
+
+
+
+```
+
+**b)**
+
+```{r} 
+
+crime = crime[,-1]
+
+crimelm = lm(expend~employ+employ:lawyers ,data = crime)
+crimelm = lm(expend~employ+lawyers ,data = crime)
+
+summary(crimelm)
+
+```
+
+**b)**
+
+```{r} 
+
+crime = crime[,-1]
+
+crimelm = lm(expend~employ+lawyers ,data = crime)
+crimelm = lm(expend~employ ,data = crime)
+
+summary(crimelm)
+
+```
+
+**c)**
+Determine a 95% prediction interval for the expend using the model you preferred in b) for a (hypothetical) state with bad=50, crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this interval?
+
+you can improve the prediction interval by reducing the variance of the data. For example this could be done by seeing if there are influence points that effect the linear model. 
+
+```{r} 
+fitted(crimelm)
+xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
+
+predict(crimelm, xnew, interval="prediction")
+
+
+
+```
+
+**d)**
+Apply the LASSO method to choose the relevant variables (with default parameters as in the lecture and lambda=lambda.1se). (You will need to install the R-package glmnet, which is not included in the standard distribution of R.) Compare the resulting model with the model obtained in b). (Beware that in general a new run delivers a new model because of a new train set.) 
+
+```{r} 
+
+
 
 ```
