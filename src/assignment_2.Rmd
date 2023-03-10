@@ -1,0 +1,89 @@
+---
+title: "assignment 2"
+author: "PD : 2737660, JO: 2672027, MD: 2641423, GR: 70"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 3)
+```
+
+## Assignment 1
+
+```{r}
+tree = read.table("../datasets/treeVolume.txt", header=TRUE)
+```
+
+**a)**
+
+You can only perform a t-test if the data contains two groups. Which is
+the case for the tree volumes since there are two types of trees.
+
+```{r}
+treeframe <- data.frame(volume=(tree$volume), 
+                        type=factor(tree$type))
+treeanov=lm(volume~type ,data = treeframe)
+anova(treeanov)
+summary(treeanov)
+par(mfrow=c(1,2)); qqnorm(residuals(treeanov)); qqline(residuals(treeanov))
+plot(fitted(treeanov),residuals(treeanov))
+```
+
+The estimated mean for the tree types is 30.171 for beeches and 35.250
+for oaks. Which is the same as the estimated mean from the anova
+summary.
+
+```{r}
+t.test(volume~type, data = tree)
+```
+
+**b)**
+To investigate the influence of diameter on the different tree types we include both diameter and type in the linear model. By doing an ANOVA test we can conclude that there in no difference between the influence of diameter between the different types. This model seems to explain the data well with an r-squared value of 0.92.
+
+To investigate the influence of height on the different tree types we include both height and type in the linear model. By doing an ANOVA test we can conclude that there in no difference between the influence of height between the different types. The model also appears to be a bad one with an r-squared value of only 0.22.
+
+```{r}
+treeframe <- data.frame(volume=(tree$volume), 
+                        type=factor(tree$type),
+                        diameter=(tree$diameter),
+                        height=(tree$height))
+
+treeanovheight=lm(volume~height+type, data = treeframe)
+treeanovdiameter=lm(volume~diameter+type, data = treeframe)
+
+anova(treeanovheight)
+anova(treeanovdiameter)
+
+summary(treeanovheight)
+summary(treeanovdiameter)
+```
+
+**c)**
+
+since both the tests from **b)** conclude that there is no difference between the influence of diameter and height on volume for the different types we can simply remove type from our model. This results in a better fit. We will then use our model to predict a value using the (overall) mean diameter and mean height.  
+
+```{r}
+
+treeanovdh=lm(volume~diameter+height, data = treeframe)
+
+summary(treeanovdh);
+
+pairs(treeframe)
+
+newxdata = data.frame(diameter=mean(treeframe$diameter), height=mean(treeframe$height))
+predict(treeanovdh, newxdata)
+  
+```
+
+**d)**
+we propose that the interaction between diameter and height will be included in the model. this way we get a better fit. explanatory values are significant.
+```{r}
+treeanov=lm(volume~diameter*height, data = treeframe)
+anova(treeanov)
+summary(treeanov)
+
+```
