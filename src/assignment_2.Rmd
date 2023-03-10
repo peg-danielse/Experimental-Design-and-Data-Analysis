@@ -12,7 +12,9 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 3)
 ```
 
-## Assignment 1
+# Assignment 2
+
+## Exercise 1
 
 ```{r}
 tree = read.table("../datasets/treeVolume.txt", header=TRUE)
@@ -41,10 +43,17 @@ summary.
 t.test(volume~type, data = tree)
 ```
 
-**b)**
-To investigate the influence of diameter on the different tree types we include both diameter and type in the linear model. By doing an ANOVA test we can conclude that there in no difference between the influence of diameter between the different types. This model seems to explain the data well with an r-squared value of 0.92.
+**b)** To investigate the influence of diameter on the different tree
+types we include both diameter and type in the linear model. By doing an
+ANOVA test we can conclude that there in no difference between the
+influence of diameter between the different types. This model seems to
+explain the data well with an r-squared value of 0.92.
 
-To investigate the influence of height on the different tree types we include both height and type in the linear model. By doing an ANOVA test we can conclude that there in no difference between the influence of height between the different types. The model also appears to be a bad one with an r-squared value of only 0.22.
+To investigate the influence of height on the different tree types we
+include both height and type in the linear model. By doing an ANOVA test
+we can conclude that there in no difference between the influence of
+height between the different types. The model also appears to be a bad
+one with an r-squared value of only 0.22.
 
 ```{r}
 treeframe <- data.frame(volume=(tree$volume), 
@@ -64,7 +73,11 @@ summary(treeanovdiameter)
 
 **c)**
 
-since both the tests from **b)** conclude that there is no difference between the influence of diameter and height on volume for the different types we can simply remove type from our model. This results in a better fit. We will then use our model to predict a value using the (overall) mean diameter and mean height.  
+since both the tests from **b)** conclude that there is no difference
+between the influence of diameter and height on volume for the different
+types we can simply remove type from our model. This results in a better
+fit. We will then use our model to predict a value using the (overall)
+mean diameter and mean height.
 
 ```{r}
 
@@ -79,11 +92,150 @@ predict(treeanovdh, newxdata)
   
 ```
 
-**d)**
-we propose that the interaction between diameter and height will be included in the model. this way we get a better fit. explanatory values are significant.
+**d)** we propose that the interaction between diameter and height will
+be included in the model. this way we get a better fit. explanatory
+values are significant.
+
 ```{r}
 treeanov=lm(volume~diameter*height, data = treeframe)
 anova(treeanov)
 summary(treeanov)
 
 ```
+
+## Exercise 2
+
+```{r}
+crime = read.table("../datasets/expensescrime.txt", header=TRUE)
+```
+
+**a)**
+
+```{r}
+pairs(crime[2:7])
+```
+
+## Exercise 3
+
+```{r}
+titanic = read.table("../datasets/titanic.txt", header=TRUE)
+```
+
+**a)**
+
+**Oh wijze paul check dit ik moet,ik denk dat estm. in de uilteg verder
+gekwantificieerd moet worden**
+
+Looking at the the data we can drawn several conclusions.
+
+-   Starting with PClass, passengers in the first class had the
+    strongest change of survival. The survival rate drops when a PClass
+    is 2nd and drops strongly when it it is a passenger from the 3rd
+    class.
+
+-   The chance of survival also drops with each year that a passenger is
+    older.
+
+-   Being male strongly decreases the chance of the passenger surviving.
+
+```{r}
+summary(titanic)
+
+titanic$PClass <- factor(titanic$PClass)
+titanic$Sex <- factor(titanic$Sex)
+titanic$Survived <- factor(titanic$Survived)
+
+tot = xtabs(~PClass + Sex, data=titanic)
+tot.c = xtabs(Survived~ PClass + Sex, data=titanic)
+round(tot.c/tot,2)
+
+
+model <- glm(Survived ~ PClass + Age + Sex, data=titanic, family=binomial())
+summary(model)
+```
+
+**b)**
+
+⚠️**Hier moet nog uitleg bij**⚠️
+
+```{r}
+model2 <- glm(Survived ~ PClass*Age* Sex, data=titanic, family=binomial())
+summary(model2)
+```
+
+| Index | PClass | Sex    |
+|-------|--------|--------|
+| 1     | 1st    | female |
+| 2     | 2nd    | female |
+| 3     | 3rd    | female |
+| 4     | 1st    | male   |
+| 5     | 2nd    | male   |
+| 6     | 3rd    | male   |
+
+The results seem to be inline with results from the previous exercise.
+Being female and travelling in a higher class seem to positively impact
+the chance of survival.
+
+```{r}
+age <- 55
+newdata <- expand.grid(PClass = c("1st", "2nd", "3rd"), Sex = c("female", "male"))
+newdata$Age <- age
+predict(model, newdata, type = "response")
+```
+
+**C)**
+
+⚠️**Is op basis van chatgpt dus diend gecheckt te worden ⚠️**
+
+To predict the survival status of passengers on the Titanic a binary
+classification model can be used such as logistic regression. This model
+can take in the passenger information such as age, sex, and passenger
+class as input features and predict whether the passenger survived or
+not as the output label.
+
+To evaluate the quality of the prediction, we can use metrics such as
+accuracy, precision, recall, and F1 score.
+
+**D)**
+
+-   Null hypothesis (H0): There is no relation between surviving the
+    titanic and class
+
+-   Alternative hypothesis (Ha): There is a relation between surviving
+    the titanic and class
+
+The p-value of the test is less than 0.05 which that we can reject H0.
+This indicates that there is significant association between a passenger
+surviving and there class.
+
+-   Null hypothesis (H0): There is no relation between surviving the
+    titanic and gender
+
+-   Alternative hypothesis (Ha): There is a relation between surviving
+    the titanic and gender
+
+The p-value of the test is less than 0.05 which that we can reject H0.
+This indicates that there is significant association between a passenger
+surviving and there gender.
+
+```{r}
+cont_table_class <- table(titanic$Survived, titanic$PClass)
+cont_table_class
+
+chisq.test(as.matrix(cont_table_class))
+
+cont_table_sex <- table(titanic$Survived, titanic$Sex)
+cont_table_sex
+
+chisq.test(as.matrix(cont_table_sex))
+```
+
+**E)**
+
+⚠️**Is op basis van chatgpt dus diend gecheckt te worden ⚠️**
+
+The second approach is not wrong but they different advantages and
+disadvantages. A property that contingency table test has is that gives
+insight on strength and direction of an association. A limitation on the
+other hand is that it does not account for more complex relationships
+between factors, also it does not provide a predictive model.
