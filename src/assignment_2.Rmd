@@ -68,3 +68,15 @@ summary(treeanov)
 ```{r}
 
 ```
+
+## Assignment 2
+
+```{r}
+crime = read.table("../datasets/expensescrime.txt", header=TRUE)
+```
+
+**a)**
+
+```{r}
+pairs(crime[2:7])
+```
