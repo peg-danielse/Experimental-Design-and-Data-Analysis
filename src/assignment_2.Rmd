@@ -110,10 +110,10 @@ y = crime2$expend
 x = crime2[,-c(1,2)]
 ```
 
-
 ```{r}
 crimedf = read.table("../datasets/expensescrime.txt", header=TRUE)
 ```
+
 ```{r}
 par(mfrow=c(3,1))
 pairs(~pop+lawyers+expend+employ+bad+crime+pop, data=crime)
@@ -124,6 +124,53 @@ pairs(~pop+lawyers+expend+employ+bad+crime+pop, data=crime)
 
 ```{r}
 pairs(crime[2:7])
+```
+
+```{r}
+
+crime = crimedf[,-1]
+
+crimelm = lm(expend~employ+lawyers ,data = crime)
+
+summary(crimelm)
+
+```
+
+**c)** Determine a 95% prediction interval for the expend using the
+model you preferred in b) for a (hypothetical) state with bad=50,
+crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this
+interval?
+
+you can improve the prediction interval by reducing the variance of the
+data. For example this could be done by removing the influence points
+that effect the linear model which we found in a). with this we get a
+smaller prediction interval.
+
+```{r}
+xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
+
+predict(crimelm, xnew, interval="prediction")
+
+crime2 = crime[-c(5, 8, 35, 44),]
+crime2lm = lm(expend~employ+crime ,data = crime2)
+predict(crime2lm, xnew, interval="prediction")
+
+```
+
+**d)** Apply the LASSO method to choose the relevant variables (with
+default parameters as in the lecture and lambda=lambda.1se). (You will
+need to install the R-package glmnet, which is not included in the
+standard distribution of R.) Compare the resulting model with the model
+obtained in b). (Beware that in general a new run delivers a new model
+because of a new train set.)
+
+```{r}
+library(glmnet)
+
+y = crime2$expend
+x = crime2[,-c(1,2)]
+
+
 ```
 
 ## Exercise 3
@@ -169,7 +216,6 @@ We checked co-linearity with the vif function which returned concerning
 values for employ, pop and to a lesser extend lawyers and bad. Which
 indicates a co-linearity.
 
-```{r}
 crimelm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
 cooks = round(cooks.distance(crimelm),2)
 indexes = which(cooks > 1)
@@ -275,40 +321,3 @@ disadvantages. A property that contingency table test has is that gives
 insight on strength and direction of an association. A limitation on the
 other hand is that it does not account for more complex relationships
 between factors, also it does not provide a predictive model.
-```{r} 
-
-crime = crimedf[,-1]
-
-crimelm = lm(expend~employ+lawyers ,data = crime)
-
-summary(crimelm)
-
-```
-
-**c)**
-Determine a 95% prediction interval for the expend using the model you preferred in b) for a (hypothetical) state with bad=50, crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this interval?
-
-you can improve the prediction interval by reducing the variance of the data. For example this could be done by removing the influence points that effect the linear model which we found in a). with this we get a smaller prediction interval.  
-
-```{r} 
-xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
-
-predict(crimelm, xnew, interval="prediction")
-
-crime2 = crime[-c(5, 8, 35, 44),]
-crime2lm = lm(expend~employ+crime ,data = crime2)
-predict(crime2lm, xnew, interval="prediction")
-
-```
-
-**d)**
-Apply the LASSO method to choose the relevant variables (with default parameters as in the lecture and lambda=lambda.1se). (You will need to install the R-package glmnet, which is not included in the standard distribution of R.) Compare the resulting model with the model obtained in b). (Beware that in general a new run delivers a new model because of a new train set.) 
-
-```{r} 
-library(glmnet)
-
-y = crime2$expend
-x = crime2[,-c(1,2)]
-
-
-```
