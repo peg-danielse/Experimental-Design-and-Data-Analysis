@@ -136,6 +136,39 @@ summary(crimelm)
 
 ```
 
+**b)**
+
+We investigate the influence points by looking at the Cooks distance. We
+
+found 4 influence points, with index 5 (CA), 8 (DC), 35 (NY), 44 (TX).
+
+We checked co-linearity with the vif function which returned concerning
+
+values for employ, pop and to a lesser extend lawyers and bad. Which
+
+indicates a co-linearity.
+
+```{r}
+crimelm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
+cooks = round(cooks.distance(crimelm),2)
+indexes = which(cooks > 1)
+plot(1:51,cooks.distance(crimelm),type="b")
+crime2 = crime[-c(5,8,35,44), ]
+#colinearity
+library(car)
+vif(crimelm)
+crimelm3 = lm(expend~crime+employ, data=crime)
+vif(crimelm3)
+summary(crimelm3)
+```
+
+```{r}
+crimelm3_le = lm(expend~lawyers+employ, data=crime)
+vif(crimelm3_le)
+crimelm3_cp = lm(expend~crime+pop, data=crime)
+vif(crimelm3_cp)
+```
+
 **c)** Determine a 95% prediction interval for the expend using the
 model you preferred in b) for a (hypothetical) state with bad=50,
 crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this
@@ -187,14 +220,20 @@ gekwantificieerd moet worden**
 Looking at the the data we can drawn several conclusions.
 
 -   Starting with PClass, passengers in the first class had the
-    strongest change of survival. The survival rate drops when a PClass
-    is 2nd and drops strongly when it it is a passenger from the 3rd
-    class.
+    strongest change of survival. The survival rate drops when the
+    PClass is the 2nd class exp(-1.29) indicates that there is 72.5%
+    less change of survival then a passenger from the first class. The
+    chance of survival drops more strongly when it is a passenger from
+    the 3rd class. A 3rd class has a survival rate of exp(-2.52) which
+    it 92% less likely to survive compared to the first class.
 
--   The chance of survival also drops with each year that a passenger is
-    older.
+-   The chance of survival drops every year a passenger is older. For
+    every the chance of survival drop by exp(-0.0391) which means 0.04%
+    a year.
 
 -   Being male strongly decreases the chance of the passenger surviving.
+    A male passenger has a exp(-2.63) which means there was a 92% less
+    chance of survival compared to female.s
 
 ```{r}
 summary(titanic)
@@ -204,36 +243,15 @@ titanic$Sex <- factor(titanic$Sex)
 titanic$Survived <- factor(titanic$Survived)
 
 tot = xtabs(~PClass + Sex, data=titanic)
-tot.c = xtabs(Survived~ PClass + Sex, data=titanic)
-round(tot.c/tot,2)
+# tot.c = xtabs(Survived~ PClass + Sex, data=titanic)
+# round(tot.c/tot,2)
 
 
 model <- glm(Survived ~ PClass + Age + Sex, data=titanic, family=binomial())
 summary(model)
-We investigate the influence points by looking at the Cooks distance. We
-found 4 influence points, with index 5 (CA), 8 (DC), 35 (NY), 44 (TX).
-We checked co-linearity with the vif function which returned concerning
-values for employ, pop and to a lesser extend lawyers and bad. Which
-indicates a co-linearity.
 
-crimelm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
-cooks = round(cooks.distance(crimelm),2)
-indexes = which(cooks > 1)
-plot(1:51,cooks.distance(crimelm),type="b")
-crime2 = crime[-c(5,8,35,44), ]
-#colinearity
-library(car)
-vif(crimelm)
-crimelm3 = lm(expend~crime+employ, data=crime)
-vif(crimelm3)
-summary(crimelm3)
-```
 
-```{r}
-crimelm3_le = lm(expend~lawyers+employ, data=crime)
-vif(crimelm3_le)
-crimelm3_cp = lm(expend~crime+pop, data=crime)
-vif(crimelm3_cp)
+
 ```
 
 **b)**
