@@ -339,3 +339,68 @@ disadvantages. A property that contingency table test has is that gives
 insight on strength and direction of an association. A limitation on the
 other hand is that it does not account for more complex relationships
 between factors, also it does not provide a predictive model.
+
+## Exercise 4
+
+```{r}
+coups = read.table("../datasets/coups.txt", header=TRUE)
+```
+
+**a)**
+
+⚠️beetje onduidelijk of het nou increasing of decreasing factoren zijn
+maar vgm increasing, ik twijfel of pollib als factor moet of niet, had
+het eerst wel maar denk toch van niet⚠️
+
+❗Todo: plot, text mss nog wat uitbreiden ❗
+
+Looking at the Poisson regression model summary , we can determine how
+much each unit impacts the variables related to the response variable.
+Based on significance there are only three variables that seem to have
+an impact. The years a country has been oligarchy and the number of
+parties a country has seem to positive association with number of coups.
+A country having a full civil rights has negative association with
+coups.
+
+```{r}
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numelec+numregim, family=poisson, data=coups)
+summary(coupsglm)
+#Add pairs diagram
+
+```
+
+**b)**
+
+After performing the step down approach we are left with same three
+significant variables. As in the model in exercise a.
+
+```{r}
+#step 1
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numregim, family=poisson, data=coups)
+#step 2 
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size, family=poisson, data=coups)
+#step 3
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn, family=poisson, data=coups)
+#step 4
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote, family=poisson, data=coups)
+# #step 5
+coupsglm = glm(miltcoup~oligarchy+pollib+parties, family=poisson, data=coups)
+summary(coupsglm)
+```
+
+**c)**
+
+⚠️Ik weet niet of alles in het model moet meenemen of dat je variabelen
+die niet het model zitten moet weg laten⚠️
+
+Based on model B the fictional country with lowest level of of civil
+right has the highest chance for a coup occurring based on the
+prediction
+
+```{r}
+newdata <- data.frame(oligarchy = mean(coups$oligarchy), pollib = c(0, 1, 2), parties = mean(coups$parties))
+
+pred = predict(coupsglm, newdata, type = "response", se.fit = TRUE)
+
+barplot(pred$fit)
+```
