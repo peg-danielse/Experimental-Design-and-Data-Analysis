@@ -106,19 +106,25 @@ pairs(~pop+lawyers+expend+employ+bad+crime+pop, data=crime)
 ```
 
 **a)**
-
+judging from the plot we can clearly see some colinearity between all values 
+exept crime. We can also spot some possible influence points.
 We investigate the influence points by looking at the Cooks distance. We
-found 4 influence points, with index 5 (CA), 8 (DC), 35 (NY), 44 (TX).
+found 4 influence points, with index 5 (CA), 8 (DC), 35 (NY), 44 (TX). These
+we remove from the data.
 We checked co-linearity with the vif function which returned concerning
-values for employ, pop and to a lesser extend lawyers and bad. Which
-indicates a co-linearity.
+values for employ, pop and to a lesser extend lawyers and bad. Which confirms
+what we expected from looking at the pairs plot. We also checked the colinearity
+of crime and the other data points and the vif indicates that it does not have 
+a colinearity problem.
 
 ```{r}
-crimelm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
-cooks = round(cooks.distance(crimelm),2)
+totallm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
+cooks = round(cooks.distance(totallm),2)
 indexes = which(cooks > 1)
 plot(1:51,cooks.distance(crimelm),type="b")
-crime2 = crime[-c(5,8,35,44), ]
+
+crime = crimedf[-indexes, ]
+
 #colinearity
 library(car)
 vif(crimelm)
@@ -135,12 +141,17 @@ vif(crimelm3_cp)
 ```
 
 **b)**
+using the step-up method we can keep adding variables to the base model. since
+we show in **a** that there is colinearity between most of the variables we can
+not add them even if they result in a higher $R^2$ value. We end up with a model
+that just uses employ.
+
 
 ```{r} 
 
 crime = crimedf[,-1]
 
-crimelm = lm(expend~employ+lawyers ,data = crime)
+crimelm = lm(expend~employ ,data = crime)
 
 summary(crimelm)
 
@@ -149,15 +160,14 @@ summary(crimelm)
 **c)**
 Determine a 95% prediction interval for the expend using the model you preferred in b) for a (hypothetical) state with bad=50, crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this interval?
 
-you can improve the prediction interval by reducing the variance of the data. For example this could be done by removing the influence points that effect the linear model which we found in a). with this we get a smaller prediction interval.  
+you can improve the prediction interval by reducing the variance of the data. This we cannot do since we removed the influence points already.
 
 ```{r} 
 xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
 
 predict(crimelm, xnew, interval="prediction")
 
-crime2 = crime[-c(5, 8, 35, 44),]
-crime2lm = lm(expend~employ+crime ,data = crime2)
+crime2lm = lm(expend~employ ,data = crime2)
 predict(crime2lm, xnew, interval="prediction")
 
 ```
