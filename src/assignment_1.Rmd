@@ -567,7 +567,7 @@ difference of the blocks. Furthermore we can use the random effect of
 the block to estimate the variance in yield.
 
 ```{r}
-library(lme4)
-npklmer=lmer(yield ~ N + (1|block), data = npk)
-summary(npklmer)
+# library(lme4.0)
+# npklmer=lmer(yield ~ N + (1|block), data = npk)
+# summary
 ```

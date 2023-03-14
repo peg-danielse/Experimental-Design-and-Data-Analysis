@@ -12,7 +12,9 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 3)
 ```
 
-## Problem 1
+# Assignment 2
+
+## Exercise 1
 
 ```{r}
 tree = read.table("../datasets/treeVolume.txt", header=TRUE)
@@ -41,10 +43,17 @@ summary.
 t.test(volume~type, data = tree)
 ```
 
-**b)**
-To investigate the influence of diameter on the different tree types we include both diameter and type in the linear model. By doing an ANOVA test we can conclude that there in no difference between the influence of diameter between the different types. This model seems to explain the data well with an r-squared value of 0.92.
+**b)** To investigate the influence of diameter on the different tree
+types we include both diameter and type in the linear model. By doing an
+ANOVA test we can conclude that there in no difference between the
+influence of diameter between the different types. This model seems to
+explain the data well with an r-squared value of 0.92.
 
-To investigate the influence of height on the different tree types we include both height and type in the linear model. By doing an ANOVA test we can conclude that there in no difference between the influence of height between the different types. The model also appears to be a bad one with an r-squared value of only 0.22.
+To investigate the influence of height on the different tree types we
+include both height and type in the linear model. By doing an ANOVA test
+we can conclude that there in no difference between the influence of
+height between the different types. The model also appears to be a bad
+one with an r-squared value of only 0.22.
 
 ```{r}
 treeframe <- data.frame(volume=(tree$volume), 
@@ -64,7 +73,11 @@ summary(treeanovdiameter)
 
 **c)**
 
-since both the tests from **b)** conclude that there is no difference between the influence of diameter and height on volume for the different types we can simply remove type from our model. This results in a better fit. We will then use our model to predict a value using the (overall) mean diameter and mean height.  
+since both the tests from **b)** conclude that there is no difference
+between the influence of diameter and height on volume for the different
+types we can simply remove type from our model. This results in a better
+fit. We will then use our model to predict a value using the (overall)
+mean diameter and mean height.
 
 ```{r}
 
@@ -79,8 +92,10 @@ predict(treeanovdh, newxdata)
   
 ```
 
-**d)**
-we propose that the interaction between diameter and height will be included in the model. this way we get a better fit. explanatory values are significant.
+**d)** we propose that the interaction between diameter and height will
+be included in the model. this way we get a better fit. explanatory
+values are significant.
+
 ```{r}
 treeanov=lm(volume~diameter*height, data = treeframe)
 anova(treeanov)
@@ -95,10 +110,10 @@ y = crime2$expend
 x = crime2[,-c(1,2)]
 ```
 
-
 ```{r}
 crimedf = read.table("../datasets/expensescrime.txt", header=TRUE)
 ```
+
 ```{r}
 par(mfrow=c(3,1))
 pairs(~pop+lawyers+expend+employ+bad+crime+pop, data=crime)
@@ -140,29 +155,31 @@ crimelm3_cp = lm(expend~crime+pop, data=crime)
 vif(crimelm3_cp)
 ```
 
+
 **b)**
 using the step-up method we can keep adding variables to the base model. since
 we show in **a** that there is colinearity between most of the variables we can
 not add them even if they result in a higher $R^2$ value. We end up with a model
 that just uses employ.
 
+you can improve the prediction interval by reducing the variance of the
+data. For example this could be done by removing the influence points
+that effect the linear model which we found in a). with this we get a
+smaller prediction interval.
 
-```{r} 
-
-crime = crimedf[,-1]
-
-crimelm = lm(expend~employ ,data = crime)
-
-summary(crimelm)
-
-```
 
 **c)**
 Determine a 95% prediction interval for the expend using the model you preferred in b) for a (hypothetical) state with bad=50, crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this interval?
 
 you can improve the prediction interval by reducing the variance of the data. This we cannot do since we removed the influence points already.
 
-```{r} 
+```{r}
+crime = crimedf[,-1]
+
+crimelm = lm(expend~employ ,data = crime)
+
+summary(crimelm)
+
 xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
 
 predict(crimelm, xnew, interval="prediction")
@@ -172,14 +189,217 @@ predict(crime2lm, xnew, interval="prediction")
 
 ```
 
-**d)**
-Apply the LASSO method to choose the relevant variables (with default parameters as in the lecture and lambda=lambda.1se). (You will need to install the R-package glmnet, which is not included in the standard distribution of R.) Compare the resulting model with the model obtained in b). (Beware that in general a new run delivers a new model because of a new train set.) 
+**d)** Apply the LASSO method to choose the relevant variables (with
+default parameters as in the lecture and lambda=lambda.1se). (You will
+need to install the R-package glmnet, which is not included in the
+standard distribution of R.) Compare the resulting model with the model
+obtained in b). (Beware that in general a new run delivers a new model
+because of a new train set.)
 
-```{r} 
+```{r}
 library(glmnet)
 
 y = crime2$expend
 x = crime2[,-c(1,2)]
 
 
+```
+
+## Exercise 3
+
+```{r}
+titanic = read.table("../datasets/titanic.txt", header=TRUE)
+```
+
+**a)**
+
+**Oh wijze paul check dit ik moet,ik denk dat estm. in de uilteg verder
+gekwantificieerd moet worden**
+
+Looking at the the data we can drawn several conclusions.
+
+-   Starting with PClass, passengers in the first class had the
+    strongest change of survival. The survival rate drops when the
+    PClass is the 2nd class exp(-1.29) indicates that there is 72.5%
+    less change of survival then a passenger from the first class. The
+    chance of survival drops more strongly when it is a passenger from
+    the 3rd class. A 3rd class has a survival rate of exp(-2.52) which
+    it 92% less likely to survive compared to the first class.
+
+-   The chance of survival drops every year a passenger is older. For
+    every the chance of survival drop by exp(-0.0391) which means 0.04%
+    a year.
+
+-   Being male strongly decreases the chance of the passenger surviving.
+    A male passenger has a exp(-2.63) which means there was a 92% less
+    chance of survival compared to female.s
+
+```{r}
+summary(titanic)
+
+titanic$PClass <- factor(titanic$PClass)
+titanic$Sex <- factor(titanic$Sex)
+titanic$Survived <- factor(titanic$Survived)
+
+tot = xtabs(~PClass + Sex, data=titanic)
+# tot.c = xtabs(Survived~ PClass + Sex, data=titanic)
+# round(tot.c/tot,2)
+
+
+model <- glm(Survived ~ PClass + Age + Sex, data=titanic, family=binomial())
+summary(model)
+
+
+
+```
+
+**b)**
+
+⚠️**Hier moet nog uitleg bij**⚠️
+
+```{r}
+model2 <- glm(Survived ~ PClass*Age* Sex, data=titanic, family=binomial())
+summary(model2)
+```
+
+| Index | PClass | Sex    |
+|-------|--------|--------|
+| 1     | 1st    | female |
+| 2     | 2nd    | female |
+| 3     | 3rd    | female |
+| 4     | 1st    | male   |
+| 5     | 2nd    | male   |
+| 6     | 3rd    | male   |
+
+The results seem to be inline with results from the previous exercise.
+Being female and travelling in a higher class seem to positively impact
+the chance of survival.
+
+```{r}
+age <- 55
+newdata <- expand.grid(PClass = c("1st", "2nd", "3rd"), Sex = c("female", "male"))
+newdata$Age <- age
+predict(model, newdata, type = "response")
+```
+
+**C)**
+
+⚠️**Is op basis van chatgpt dus diend gecheckt te worden ⚠️**
+
+To predict the survival status of passengers on the Titanic a binary
+classification model can be used such as logistic regression. This model
+can take in the passenger information such as age, sex, and passenger
+class as input features and predict whether the passenger survived or
+not as the output label.
+
+To evaluate the quality of the prediction, we can use metrics such as
+accuracy, precision, recall, and F1 score.
+
+**D)**
+
+-   Null hypothesis (H0): There is no relation between surviving the
+    titanic and class
+
+-   Alternative hypothesis (Ha): There is a relation between surviving
+    the titanic and class
+
+The p-value of the test is less than 0.05 which that we can reject H0.
+This indicates that there is significant association between a passenger
+surviving and there class.
+
+-   Null hypothesis (H0): There is no relation between surviving the
+    titanic and gender
+
+-   Alternative hypothesis (Ha): There is a relation between surviving
+    the titanic and gender
+
+The p-value of the test is less than 0.05 which that we can reject H0.
+This indicates that there is significant association between a passenger
+surviving and there gender.
+
+```{r}
+cont_table_class <- table(titanic$Survived, titanic$PClass)
+cont_table_class
+
+chisq.test(as.matrix(cont_table_class))
+
+cont_table_sex <- table(titanic$Survived, titanic$Sex)
+cont_table_sex
+
+chisq.test(as.matrix(cont_table_sex))
+```
+
+**E)**
+
+⚠️**Is op basis van chatgpt dus diend gecheckt te worden ⚠️**
+
+The second approach is not wrong but they different advantages and
+disadvantages. A property that contingency table test has is that gives
+insight on strength and direction of an association. A limitation on the
+other hand is that it does not account for more complex relationships
+between factors, also it does not provide a predictive model.
+
+## Exercise 4
+
+```{r}
+coups = read.table("../datasets/coups.txt", header=TRUE)
+```
+
+**a)**
+
+⚠️beetje onduidelijk of het nou increasing of decreasing factoren zijn
+maar vgm increasing, ik twijfel of pollib als factor moet of niet, had
+het eerst wel maar denk toch van niet⚠️
+
+❗Todo: plot, text mss nog wat uitbreiden ❗
+
+Looking at the Poisson regression model summary , we can determine how
+much each unit impacts the variables related to the response variable.
+Based on significance there are only three variables that seem to have
+an impact. The years a country has been oligarchy and the number of
+parties a country has seem to positive association with number of coups.
+A country having a full civil rights has negative association with
+coups.
+
+```{r}
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numelec+numregim, family=poisson, data=coups)
+summary(coupsglm)
+#Add pairs diagram
+
+```
+
+**b)**
+
+After performing the step down approach we are left with same three
+significant variables. As in the model in exercise a.
+
+```{r}
+#step 1
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numregim, family=poisson, data=coups)
+#step 2 
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size, family=poisson, data=coups)
+#step 3
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn, family=poisson, data=coups)
+#step 4
+coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote, family=poisson, data=coups)
+# #step 5
+coupsglm = glm(miltcoup~oligarchy+pollib+parties, family=poisson, data=coups)
+summary(coupsglm)
+```
+
+**c)**
+
+⚠️Ik weet niet of alles in het model moet meenemen of dat je variabelen
+die niet het model zitten moet weg laten⚠️
+
+Based on model B the fictional country with lowest level of of civil
+right has the highest chance for a coup occurring based on the
+prediction
+
+```{r}
+newdata <- data.frame(oligarchy = mean(coups$oligarchy), pollib = c(0, 1, 2), parties = mean(coups$parties))
+
+pred = predict(coupsglm, newdata, type = "response", se.fit = TRUE)
+
+barplot(pred$fit)
 ```
