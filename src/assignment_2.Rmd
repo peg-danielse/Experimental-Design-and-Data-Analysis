@@ -103,12 +103,7 @@ summary(treeanov)
 
 ```
 
-## Problem 2
-
-```{r}
-y = crime2$expend
-x = crime2[,-c(1,2)]
-```
+## Problem 2 
 
 ```{r}
 crimedf = read.table("../datasets/expensescrime.txt", header=TRUE)
@@ -116,92 +111,101 @@ crimedf = read.table("../datasets/expensescrime.txt", header=TRUE)
 
 ```{r}
 par(mfrow=c(3,1))
-pairs(~pop+lawyers+expend+employ+bad+crime+pop, data=crime)
+pairs(~pop+lawyers+expend+employ+bad+crime+pop, data=crimedf)
 # pairs(~bad+crime+pop, data=crime)
 ```
 
-**a)**
-judging from the plot we can clearly see some colinearity between all values 
-exept crime. We can also spot some possible influence points.
+**a)** judging from the plot we can clearly see some colinearity between
+all values exept crime. We can also spot some possible influence points.
 We investigate the influence points by looking at the Cooks distance. We
-found 4 influence points, with index 5 (CA), 8 (DC), 35 (NY), 44 (TX). These
-we remove from the data.
-We checked co-linearity with the vif function which returned concerning
-values for employ, pop and to a lesser extend lawyers and bad. Which confirms
-what we expected from looking at the pairs plot. We also checked the colinearity
-of crime and the other data points and the vif indicates that it does not have 
-a colinearity problem.
+found 4 influence points, with index 5 (CA), 8 (DC), 35 (NY), 44 (TX).
+These we remove from the data. We checked co-linearity with the vif
+function which returned concerning values for employ, pop and to a
+lesser extend lawyers and bad. Which confirms what we expected from
+looking at the pairs plot. We also checked the colinearity of crime and
+the other data points and the vif indicates that it does not have a
+colinearity problem.
 
 ```{r}
-totallm = lm(expend~bad+crime+lawyers+employ+pop, data=crime)
+totallm = lm(expend~bad+crime+lawyers+employ+pop, data=crimedf)
 cooks = round(cooks.distance(totallm),2)
 indexes = which(cooks > 1)
-plot(1:51,cooks.distance(crimelm),type="b")
+plot(1:51,cooks.distance(totallm),type="b")
 
-crime = crimedf[-indexes, ]
+crime_w = crimedf[,-1]
+crime = crime_w[-indexes, ]
 
 #colinearity
 library(car)
+vif(totallm)
+crimelm = lm(expend~crime+employ, data=crime)
 vif(crimelm)
-crimelm3 = lm(expend~crime+employ, data=crime)
-vif(crimelm3)
-summary(crimelm3)
+summary(crimelm)
 ```
 
 ```{r}
-crimelm3_le = lm(expend~lawyers+employ, data=crime)
-vif(crimelm3_le)
-crimelm3_cp = lm(expend~crime+pop, data=crime)
-vif(crimelm3_cp)
+crimelm_le = lm(expend~lawyers+employ, data=crime)
+vif(crimelm_le)
+crimelm_cp = lm(expend~crime+pop, data=crime)
+vif(crimelm_cp)
 ```
 
-
-**b)**
-using the step-up method we can keep adding variables to the base model. since
-we show in **a** that there is colinearity between most of the variables we can
-not add them even if they result in a higher $R^2$ value. We end up with a model
-that just uses employ.
+**b)** using the step-up method we can keep adding variables to the base
+model. since we show in **a** that there is colinearity between most of
+the variables we can not add them even if they result in a higher $R^2$
+value. We end up with a model that just uses employ.
 
 you can improve the prediction interval by reducing the variance of the
 data. For example this could be done by removing the influence points
 that effect the linear model which we found in a). with this we get a
 smaller prediction interval.
 
+**c)** Determine a 95% prediction interval for the expend using the
+model you preferred in b) for a (hypothetical) state with bad=50,
+crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this
+interval?
 
-**c)**
-Determine a 95% prediction interval for the expend using the model you preferred in b) for a (hypothetical) state with bad=50, crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this interval?
-
-you can improve the prediction interval by reducing the variance of the data. This we cannot do since we removed the influence points already.
+you can improve the prediction interval by reducing the variance of the
+data. This we cannot do since we removed the influence points already.
 
 ```{r}
-crime = crimedf[,-1]
-
-crimelm = lm(expend~employ ,data = crime)
-
-summary(crimelm)
-
 xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
-
 predict(crimelm, xnew, interval="prediction")
-
-crime2lm = lm(expend~employ ,data = crime2)
-predict(crime2lm, xnew, interval="prediction")
 
 ```
 
-**d)** Apply the LASSO method to choose the relevant variables (with
-default parameters as in the lecture and lambda=lambda.1se). (You will
-need to install the R-package glmnet, which is not included in the
-standard distribution of R.) Compare the resulting model with the model
-obtained in b). (Beware that in general a new run delivers a new model
-because of a new train set.)
+**d)**
+
+We applied lasso to the data set. Here we found that lasso uses the
+values that we classified to be co-linear. Therefore this does produce a
+similar model but we can show by comparing the lasso model with our
+model that the lasso model is significantly different from ours and that
+therefore we cannot prefer our model because it contains less variables.
+There might be some explanatory value we missed by not including the
+variables we thought to be co linear.
 
 ```{r}
 library(glmnet)
+library(Matrix)
 
-y = crime2$expend
-x = crime2[,-c(1,2)]
+y = crime$expend
+x = crime[,-c(1,2)]
 
+train=sample(1:nrow(x),0.67*nrow(x)) # train by using 2/3 of the data
+x.train=x[train,]; y.train=y[train] # data to train
+x.test=x[-train,]; y.test=y[-train] # data to test the prediction quality
+lasso.mod=glmnet(x.train,y.train,alpha=1)
+cv.lasso=cv.glmnet(as.matrix(x.train),y.train,alpha=1,type.measure="mse")
+plot(lasso.mod,label=T,xvar="lambda") #have a look at the lasso path
+plot(cv.lasso) # the best lambda by cross-validation
+plot(cv.lasso$glmnet.fit,xvar="lambda",label=T)
+
+lambda.min=cv.lasso$lambda.min; lambda.1se=cv.lasso$lambda.1se
+coef(lasso.mod,s=cv.lasso$lambda.min) #beta’s for the best lambda
+y.pred=predict(lasso.mod,s=lambda.min,newx=as.matrix(x.test)) #predict for test
+mse.lasso=mean((y.test-y.pred)^2) #mse for the predicted test rows
+
+anova(lm(expend~crime+lawyers+employ+pop, data=crime), crimelm)
 
 ```
 
@@ -255,7 +259,7 @@ summary(model)
 
 **b)**
 
-⚠️**Hier moet nog uitleg bij**⚠️
+**Hier moet nog uitleg bij**
 
 ```{r}
 model2 <- glm(Survived ~ PClass*Age* Sex, data=titanic, family=binomial())
@@ -284,7 +288,7 @@ predict(model, newdata, type = "response")
 
 **C)**
 
-⚠️**Is op basis van chatgpt dus diend gecheckt te worden ⚠️**
+**Is op basis van chatgpt dus diend gecheckt te worden**
 
 To predict the survival status of passengers on the Titanic a binary
 classification model can be used such as logistic regression. This model
@@ -331,7 +335,7 @@ chisq.test(as.matrix(cont_table_sex))
 
 **E)**
 
-⚠️**Is op basis van chatgpt dus diend gecheckt te worden ⚠️**
+**Is op basis van chatgpt dus diend gecheckt te worden**
 
 The second approach is not wrong but they different advantages and
 disadvantages. A property that contingency table test has is that gives
@@ -347,11 +351,11 @@ coups = read.table("../datasets/coups.txt", header=TRUE)
 
 **a)**
 
-⚠️beetje onduidelijk of het nou increasing of decreasing factoren zijn
+beetje onduidelijk of het nou increasing of decreasing factoren zijn
 maar vgm increasing, ik twijfel of pollib als factor moet of niet, had
-het eerst wel maar denk toch van niet⚠️
+het eerst wel maar denk toch van niet
 
-❗Todo: plot, text mss nog wat uitbreiden ❗
+Todo: plot, text mss nog wat uitbreiden
 
 Looking at the Poisson regression model summary , we can determine how
 much each unit impacts the variables related to the response variable.
@@ -365,6 +369,7 @@ coups.
 coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numelec+numregim, family=poisson, data=coups)
 summary(coupsglm)
 #Add pairs diagram
+pairs(coups)
 
 ```
 
@@ -389,8 +394,8 @@ summary(coupsglm)
 
 **c)**
 
-⚠️Ik weet niet of alles in het model moet meenemen of dat je variabelen
-die niet het model zitten moet weg laten⚠️
+Ik weet niet of alles in het model moet meenemen of dat je variabelen
+die niet het model zitten moet weg laten
 
 Based on model B the fictional country with lowest level of of civil
 right has the highest chance for a coup occurring based on the
