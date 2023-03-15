@@ -22,8 +22,11 @@ tree = read.table("../datasets/treeVolume.txt", header=TRUE)
 
 **a)**
 
-You can only perform a t-test if the data contains two groups. Which is
-the case for the tree volumes since there are two types of trees.
+To investigate the differences in tree types we want to use a t-test. You can 
+only perform a t-test if the data contains two groups. Which is
+the case for the tree volumes since there are two types of trees. Therefore,
+it is similar to the T-test in the results but not in the statistic used for
+arriving at the result since anova uses an f distributed statistic.
 
 ```{r}
 treeframe <- data.frame(volume=(tree$volume), 
@@ -103,7 +106,7 @@ summary(treeanov)
 
 ```
 
-## Problem 2 
+## Problem 2
 
 ```{r}
 crimedf = read.table("../datasets/expensescrime.txt", header=TRUE)
@@ -160,19 +163,15 @@ data. For example this could be done by removing the influence points
 that effect the linear model which we found in a). with this we get a
 smaller prediction interval.
 
-**c)** Determine a 95% prediction interval for the expend using the
-model you preferred in b) for a (hypothetical) state with bad=50,
-crime=5000, lawyers=5000, employ=5000 and pop=5000. Can you improve this
-interval?
-
-you can improve the prediction interval by reducing the variance of the
-data. This we cannot do since we removed the influence points already.
-
+**c)** 
 ```{r}
 xnew = data.frame(bad=50, crime=5000, lawyers=5000, employ=5000, pop=5000)
 predict(crimelm, xnew, interval="prediction")
 
 ```
+
+We cannot improve this confident interval since we removed the influence points 
+already.
 
 **d)**
 
@@ -196,7 +195,6 @@ x.train=x[train,]; y.train=y[train] # data to train
 x.test=x[-train,]; y.test=y[-train] # data to test the prediction quality
 lasso.mod=glmnet(x.train,y.train,alpha=1)
 cv.lasso=cv.glmnet(as.matrix(x.train),y.train,alpha=1,type.measure="mse")
-plot(lasso.mod,label=T,xvar="lambda") #have a look at the lasso path
 plot(cv.lasso) # the best lambda by cross-validation
 plot(cv.lasso$glmnet.fit,xvar="lambda",label=T)
 
@@ -244,10 +242,27 @@ summary(titanic)
 titanic$PClass <- factor(titanic$PClass)
 titanic$Sex <- factor(titanic$Sex)
 titanic$Survived <- factor(titanic$Survived)
+titanic$Age<-factor(titanic$Age)
 
-tot = xtabs(~PClass + Sex, data=titanic)
-# tot.c = xtabs(Survived~ PClass + Sex, data=titanic)
-# round(tot.c/tot,2)
+xtabs(~PClass + Sex, data=titanic)
+
+tot = xtabs(~PClass + Age + Survived, data=titanic)
+hist(tot)
+
+xtabs(Survived~Age + PClass, data=titanic)
+
+
+tot = xtabs(~PClass, data=titanic)
+tot
+tot.c = xtabs(Survived~PClass, data=titanic)
+tot.c
+round(tot.c/tot,2)
+
+
+
+
+barplot(xtabs(cancer~age,data=esoph)/totage)
+
 
 
 model <- glm(Survived ~ PClass + Age + Sex, data=titanic, family=binomial())
@@ -286,7 +301,7 @@ newdata$Age <- age
 predict(model, newdata, type = "response")
 ```
 
-**C)**
+**c)**
 
 **Is op basis van chatgpt dus diend gecheckt te worden**
 
@@ -299,7 +314,7 @@ not as the output label.
 To evaluate the quality of the prediction, we can use metrics such as
 accuracy, precision, recall, and F1 score.
 
-**D)**
+**d)**
 
 -   Null hypothesis (H0): There is no relation between surviving the
     titanic and class
@@ -333,7 +348,7 @@ cont_table_sex
 chisq.test(as.matrix(cont_table_sex))
 ```
 
-**E)**
+**e)**
 
 **Is op basis van chatgpt dus diend gecheckt te worden**
 
@@ -349,23 +364,18 @@ between factors, also it does not provide a predictive model.
 coups = read.table("../datasets/coups.txt", header=TRUE)
 ```
 
-**a)**
-
-beetje onduidelijk of het nou increasing of decreasing factoren zijn
-maar vgm increasing, ik twijfel of pollib als factor moet of niet, had
-het eerst wel maar denk toch van niet
-
-Todo: plot, text mss nog wat uitbreiden
-
-Looking at the Poisson regression model summary , we can determine how
-much each unit impacts the variables related to the response variable.
-Based on significance there are only three variables that seem to have
-an impact. The years a country has been oligarchy and the number of
-parties a country has seem to positive association with number of coups.
-A country having a full civil rights has negative association with
-coups.
+**a)** Looking at the Poisson regression model summary , we can
+determine how much each unit impacts the variables related to the
+response variable. Based on significance there are only three variables
+that seem to have an impact. The years a country has been an oligarchy
+and the number of parties a country has, appears to positively correlate
+with the number of coups. Having limited civil rights does not have a
+significant effect on the numbers of coups, having full civil rights
+however has a negative association with coups.
 
 ```{r}
+pairs(~oligarchy+pollib+parties+pctvote+popn+size+numelec+numregim, data=coups)
+coups$pollib <- as.factor(coups$pollib)
 coupsglm = glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numelec+numregim, family=poisson, data=coups)
 summary(coupsglm)
 #Add pairs diagram
@@ -373,10 +383,8 @@ pairs(coups)
 
 ```
 
-**b)**
-
-After performing the step down approach we are left with same three
-significant variables. As in the model in exercise a.
+**b)** After performing the step down approach we are left with same
+three significant variables. As in the model in exercise a.
 
 ```{r}
 #step 1
@@ -392,19 +400,15 @@ coupsglm = glm(miltcoup~oligarchy+pollib+parties, family=poisson, data=coups)
 summary(coupsglm)
 ```
 
-**c)**
-
-Ik weet niet of alles in het model moet meenemen of dat je variabelen
-die niet het model zitten moet weg laten
-
-Based on model B the fictional country with lowest level of of civil
-right has the highest chance for a coup occurring based on the
+**c)** Based on model B the fictional country with lowest level of of
+civil right has the highest chance for a coup occurring based on the
 prediction
 
 ```{r}
-newdata <- data.frame(oligarchy = mean(coups$oligarchy), pollib = c(0, 1, 2), parties = mean(coups$parties))
+newdata <- data.frame(oligarchy = mean(coups$oligarchy), pollib = as.factor(c(0, 1, 2)), parties = mean(coups$parties))
+
 
 pred = predict(coupsglm, newdata, type = "response", se.fit = TRUE)
 
-barplot(pred$fit)
+pred
 ```
